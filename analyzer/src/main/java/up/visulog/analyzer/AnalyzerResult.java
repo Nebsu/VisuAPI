@@ -20,9 +20,6 @@ public class AnalyzerResult {
     }
 
     public String toHTML() throws IOException {
-        CreatePage c = new CreatePage();
-        c.creer("<html><body>"+subResults.stream().map(AnalyzerPlugin.Result::getResultAsHtmlDiv).reduce("", (acc, cur) -> acc + cur) + "</body></html>");
-        c.ouvrirPage();
         return "<html><body>"+subResults.stream().map(AnalyzerPlugin.Result::getResultAsHtmlDiv).reduce("", (acc, cur) -> acc + cur) + "</body></html>";
     }
 }

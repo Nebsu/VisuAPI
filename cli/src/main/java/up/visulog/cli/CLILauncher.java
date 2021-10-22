@@ -3,6 +3,7 @@ package up.visulog.cli;
 import up.visulog.analyzer.Analyzer;
 import up.visulog.config.Configuration;
 import up.visulog.config.PluginConfig;
+import up.visulog.analyzer.CreatePage;
 
 import java.io.IOException;
 import java.nio.file.FileSystems;
@@ -16,7 +17,10 @@ public class CLILauncher {
         if (config.isPresent()) {
             var analyzer = new Analyzer(config.get());
             var results = analyzer.computeResults();
-            System.out.println(results.toHTML());
+            //System.out.println(results.toHTML());
+            CreatePage c = new CreatePage();
+            c.creer(results.toHTML());
+            c.ouvrirPage();
         } else displayHelpAndExit();
     }
 
