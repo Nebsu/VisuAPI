@@ -4,13 +4,14 @@ import up.visulog.analyzer.Analyzer;
 import up.visulog.config.Configuration;
 import up.visulog.config.PluginConfig;
 
+import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.util.HashMap;
 import java.util.Optional;
 
 public class CLILauncher {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         var config = makeConfigFromCommandLineArgs(args);
         if (config.isPresent()) {
             var analyzer = new Analyzer(config.get());

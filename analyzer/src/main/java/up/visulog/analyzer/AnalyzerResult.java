@@ -1,5 +1,6 @@
 package up.visulog.analyzer;
 
+import java.io.IOException;
 import java.util.List;
 
 public class AnalyzerResult {
@@ -18,7 +19,10 @@ public class AnalyzerResult {
         return subResults.stream().map(AnalyzerPlugin.Result::getResultAsString).reduce("", (acc, cur) -> acc + "\n" + cur);
     }
 
-    public String toHTML() {
+    public String toHTML() throws IOException {
+        CreatePage c = new CreatePage();
+        c.creer("<html><body>"+subResults.stream().map(AnalyzerPlugin.Result::getResultAsHtmlDiv).reduce("", (acc, cur) -> acc + cur) + "</body></html>");
+        c.ouvrirPage();
         return "<html><body>"+subResults.stream().map(AnalyzerPlugin.Result::getResultAsHtmlDiv).reduce("", (acc, cur) -> acc + cur) + "</body></html>";
     }
 }
