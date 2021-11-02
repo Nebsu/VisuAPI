@@ -2,8 +2,6 @@ package up.visulog.analyzer;
 
 import java.io.*;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Scanner;
 
 public class getAPI {
@@ -33,8 +31,7 @@ public class getAPI {
     }
 
     public static void main(String[] args) throws IOException {
-        getAPI a = new getAPI(3389,"a8ax_oKvn8CMzvyPmxUD1","https://gaufre.informatique.univ-paris-diderot.fr");
-        getAPI b = new getAPI(278964,"efzccqe","https://gitlab.com");
+        getAPI a = new getAPI(3389,"8ax_oKvn8CMzvyPmxUD1","https://gaufre.informatique.univ-paris-diderot.fr");
         //URL url = new URL("https://gaufre.informatique.univ-paris-diderot.fr/api/v4/groups/1711/members/?private_token=8ax_oKvn8CMzvyPmxUD1");
         // URL url = new URL("https://gitlab.com/api/v4/projects/278964");
         // InputStream is = url.openConnection().getInputStream();
@@ -49,7 +46,7 @@ public class getAPI {
     public boolean testAdresse() {
         try {
             URL url = new URL(this.Adresse + "/api/v4/projects");
-            InputStream is = url.openConnection().getInputStream();
+            url.openConnection().getInputStream();
         }
         catch (Exception e) {
             if(e.toString().substring(0,31).equals("java.net.MalformedURLException:")) {
@@ -66,7 +63,7 @@ public class getAPI {
     public boolean testToken() {
         try {
             URL url = new URL(this.Adresse + "/api/v4/projects?private_token=" + this.Token);
-            InputStream is = url.openConnection().getInputStream();
+            url.openConnection().getInputStream();
         }
         catch (Exception e) {
             System.out.println("Clé invalide, Veuillez réinserer une clé valide ou appuyez sur entrée pour ne pas utiliser de clé.");
@@ -78,7 +75,7 @@ public class getAPI {
     public boolean testProject() {
         try {
             URL url = new URL(this.Adresse + "/api/v4/projects/" + this.Project + "?private_token=" + this.Token);
-            InputStream is = url.openConnection().getInputStream();
+            url.openConnection().getInputStream();
         }
         catch (Exception e) {
             System.out.println("ID de projet invalide veuillez réinserer l'ID.");
@@ -88,8 +85,7 @@ public class getAPI {
     }
 
     public String scan() {
-        Scanner scanner = new Scanner(System.in);
-        return scanner.nextLine();
+        return new Scanner(System.in).nextLine();
     }
 
 }
