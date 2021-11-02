@@ -4,44 +4,36 @@ import java.io.*;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
 
 public class getAPI {
     private String Token;
     private int Project;
     public String Adresse;
-
-    public getAPI(int project, String adresse) {
-        this.Project = project;
-        if(adresse == null) {
-            this.Adresse = "https://gitlab.com";
-        }
-        else {
-            this.Adresse = adresse;
-            while(!testAdresse()) {
-                System.out.println("Veuillez réinserer l'adresse ou appuyez sur entrée pour utiliser l'adresse par defaut : https://gitlab.com");
-                //implementer le scanner pour lire l'url
-                // if(sacnner == null) {
-                //     this.Adresse = "https://gitlab.com";
-                //     break;
-                // }
-            }
-        }
-    }
+    // API : https://docs.gitlab.com/ee/api/api_resources.html
     
     public getAPI(int project,String token,String adresse) {
-        this(project,adresse);
+        this.Adresse = adresse;
+        while(!testAdresse()) {
+            this.Adresse = scan();
+        }
         this.Token = token;
         while(!testToken()) {
-            //cimplementer le scanner pour lire le token
-            // if(scanner == null) {
-            //     this.Token = null;
-            //     break;
-            // }
+            this.Token = scan();
+        }
+        this.Project = project;
+        while(!testProject()) {
+            try {
+                this.Project = Integer.parseInt(scan());
+            }
+            catch (Exception e) {
+                System.out.println("Veuillez entré des chiffres");
+            }
         }
     }
 
     public static void main(String[] args) throws IOException {
-        getAPI a = new getAPI(3389,"8ax_oKvn8CMzvyPmxUD1","https://gaufre.informatique.univ-paris-diderot.fr");
+        getAPI a = new getAPI(3389,"a8ax_oKvn8CMzvyPmxUD1","https://gaufre.informatique.univ-paris-diderot.fr");
         getAPI b = new getAPI(278964,"efzccqe","https://gitlab.com");
         //URL url = new URL("https://gaufre.informatique.univ-paris-diderot.fr/api/v4/groups/1711/members/?private_token=8ax_oKvn8CMzvyPmxUD1");
         // URL url = new URL("https://gitlab.com/api/v4/projects/278964");
@@ -60,33 +52,20 @@ public class getAPI {
             InputStream is = url.openConnection().getInputStream();
         }
         catch (Exception e) {
-            if(e.toString().equals("java.net.UnknownHostException: gaufre.informatique.univ-paris-diderot.fr")) { // modifier le string de l'execption pour garder suelemnt la partie "java.net.UnknownHostException:"
-                System.out.println("Impossible de récupérer la requête.");
-                System.out.println("Vérifiez vos paramètres de connexion.");
+            if(e.toString().substring(0,31).equals("java.net.MalformedURLException:")) {
+                System.out.println("Adresse invalide, veuillez inserer un URL du type: https://gitlab.com ou appuyer sur entré pour utiliser https://gitlab.com");
             }
             else {
-                System.out.println("L'adresse donné ne permet pas d'acceder à l'api de gitlab.");
+                System.out.println("Erreur de connexion verifier votre connexion internet et réinserer votre URL");
             }
             return false;
         }
         return true;
     }
 
-    public Object[] countcommit() { //A FAIRE
-        String s = this.Adresse + "/api/v4/projects/" + this.Project +"/repository/commits";
-        if(this.Token != null) {
-            s = s + "?private_token=" + this.Token;
-        }
-        else {
-
-        }
-        Object[] result = new Object[2];
-        return result;
-    }
-
     public boolean testToken() {
         try {
-            URL url = new URL(this.Adresse + "?token=" + this.Token);
+            URL url = new URL(this.Adresse + "/api/v4/projects?private_token=" + this.Token);
             InputStream is = url.openConnection().getInputStream();
         }
         catch (Exception e) {
@@ -94,6 +73,23 @@ public class getAPI {
             return false;
         }
         return true;
+    }
+
+    public boolean testProject() {
+        try {
+            URL url = new URL(this.Adresse + "/api/v4/projects/" + this.Project + "?private_token=" + this.Token);
+            InputStream is = url.openConnection().getInputStream();
+        }
+        catch (Exception e) {
+            System.out.println("ID de projet invalide veuillez réinserer l'ID.");
+            return false;
+        }
+        return true;
+    }
+
+    public String scan() {
+        Scanner scanner = new Scanner(System.in);
+        return scanner.nextLine();
     }
 
 }
