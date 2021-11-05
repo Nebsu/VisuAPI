@@ -4,7 +4,7 @@ import java.io.*;
 import java.net.URL;
 import java.util.Scanner;
 
-public class getAPI {
+public abstract class getAPI {
     private String Token;
     private int Project;
     public String Adresse;
@@ -31,7 +31,6 @@ public class getAPI {
     }
 
     public static void main(String[] args) throws IOException {
-        getAPI a = new getAPI(3389,"8ax_oKvn8CMzvyPmxUD1","https://gaufre.informatique.univ-paris-diderot.fr");
         //URL url = new URL("https://gaufre.informatique.univ-paris-diderot.fr/api/v4/groups/1711/members/?private_token=8ax_oKvn8CMzvyPmxUD1");
         // URL url = new URL("https://gitlab.com/api/v4/projects/278964");
         // InputStream is = url.openConnection().getInputStream();
@@ -86,6 +85,31 @@ public class getAPI {
 
     public String scan() {
         return new Scanner(System.in).nextLine();
+    }
+
+    protected void request(String uri, String args) throws IOException {
+        String s = "";
+        if(this.Token != null) {
+            uri += "?private_token=" + this.Token;
+            if(args != null) {
+                uri += "&" + args;
+            }
+        }
+        else if(args != null) {
+            uri += "?" + args;
+        }
+        URL url = new URL(this.Adresse + "/api/v4/" + uri);
+        InputStream is = url.openConnection().getInputStream();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        String line = null;
+        FileOutputStream output = new FileOutputStream("request.json");
+        while ((line = reader.readLine()) != null) {
+            s = s + line;
+        }
+        output.write(s.getBytes());
+        output.flush();
+        output.close();
+        reader.close();
     }
 
 }
