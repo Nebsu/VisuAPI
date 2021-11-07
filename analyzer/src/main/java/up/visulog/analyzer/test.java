@@ -11,7 +11,7 @@ import java.io.IOException;
 
 public class test extends getAPI {
 
-    public test(int project,String token,String adresse) {
+    public test(String project,String token,String adresse) {
         super(project,token,adresse);
     }
 

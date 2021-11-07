@@ -23,7 +23,7 @@ public class CLILauncher {
             var results = analyzer.computeResults();
             //System.out.println(results.toHTML());
             //getAPI g = new getAPI(3389,"8ax_oKvn8CMzvyPmxUD1","https://gaufre.informatique.univ-paris-diderot.fr");
-            test t = new test(3389,"8ax_oKvn8CMzvyPmxUD1","https://gaufre.informatique.univ-paris-diderot.fr");
+            test t = new test("3389","8ax_oKvn8CMzvyPmxUD1","https://gaufre.informatique.univ-paris-diderot.fr");
             t.fonction();
             CreatePage c = new CreatePage();
             c.creer(results.toHTML());

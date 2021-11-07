@@ -4,3 +4,6 @@ build/
 .project
 bin/
 .gradle/
+.vscode/settings.json
+cli/example.html
+cli/request.json
