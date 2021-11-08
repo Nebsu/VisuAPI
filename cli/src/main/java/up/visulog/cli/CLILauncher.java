@@ -5,7 +5,6 @@ import up.visulog.config.Configuration;
 import up.visulog.config.PluginConfig;
 import up.visulog.analyzer.CreatePage;
 import up.visulog.analyzer.getAPI;
-import up.visulog.analyzer.test;
 
 import java.io.IOException;
 import java.nio.file.FileSystems;
@@ -21,10 +20,6 @@ public class CLILauncher {
         if (config.isPresent()) {
             var analyzer = new Analyzer(config.get());
             var results = analyzer.computeResults();
-            //System.out.println(results.toHTML());
-            //getAPI g = new getAPI(3389,"8ax_oKvn8CMzvyPmxUD1","https://gaufre.informatique.univ-paris-diderot.fr");
-            test t = new test("3389","8ax_oKvn8CMzvyPmxUD1","https://gaufre.informatique.univ-paris-diderot.fr");
-            t.fonction();
             CreatePage c = new CreatePage();
             c.creer(results.toHTML());
             c.ouvrirPage();

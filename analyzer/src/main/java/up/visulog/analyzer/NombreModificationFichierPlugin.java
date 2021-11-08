@@ -14,7 +14,7 @@ public class NombreModificationFichierPlugin extends getAPI {
     private String Branche;
 
     // L'adresse c'est sans api/v4 et sans l'id projet
-    public NombreModificationFichierPlugin(int project, String token, String adresse, String Chemin, String Branche) {
+    public NombreModificationFichierPlugin(String project, String token, String adresse, String Chemin, String Branche) {
         // Pour pouvoir utiliser le plugin il faut instancier le la classe avec : L'ID du projet,Un token existant,L'adresse du site (/!\ attention du site pas du projet),
         // le chemin du fichier depuis votre dossier de dépot et pour finir la branche GIT d'où vous voulez partir (le tout dans cet ordre)
         // Il y a un exemple dans le main
@@ -84,13 +84,11 @@ public class NombreModificationFichierPlugin extends getAPI {
         JSONParser jsonP = new JSONParser();
         try {
             if (s.equals("diff")) {
-                JSONArray differences = (JSONArray) jsonP.parse(new FileReader("C:/Java/Git/Projet/request.json"));
+                JSONArray differences = (JSONArray) jsonP.parse(new FileReader("request.json"));
                 for (Object diff : differences) {
                     JSONObject temp = (JSONObject) diff;
                     String newP = temp.get("new_path").toString();
                     String oldP = temp.get("old_path").toString();
-                    // System.out.println(" Compare : " + this.Chemin);
-                    // System.out.println(" Avec {"+oldP+","+newP+"}");
                     if (oldP.equals(this.Chemin) || newP.equals(this.Chemin)) {
                         return "true";
                     }
@@ -98,7 +96,7 @@ public class NombreModificationFichierPlugin extends getAPI {
                 return "false";
             } 
             else {
-                JSONObject jsonO = (JSONObject) jsonP.parse(new FileReader("C:/Java/Git/Projet/request.json"));
+                JSONObject jsonO = (JSONObject) jsonP.parse(new FileReader("request.json"));
                 if (s.equals("parent")) {
                     JSONArray array = (JSONArray) jsonO.get("parent_ids");
                     String parent = "";
@@ -173,10 +171,4 @@ public class NombreModificationFichierPlugin extends getAPI {
         return res;
     }
 
-
-    public static void main(String[] args) throws IOException { // org.json.simple.parser.ParseException
-        NombreModificationFichierPlugin test = new NombreModificationFichierPlugin(3389, "8ax_oKvn8CMzvyPmxUD1","https://gaufre.informatique.univ-paris-diderot.fr","analyzer/src/main/java/up/visulog/analyzer/AnalyzerResult.java", "ObtentionAPI");
-        test.NombreModif();
-    
-    }
 }
