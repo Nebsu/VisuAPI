@@ -7,9 +7,6 @@ public class CreatePage {
     public void creer(String s) throws IOException {
         File f = new File("example.html");
         FileOutputStream fos = new FileOutputStream("example.html");
-        if(f.exists()) {
-            f.delete();
-        }
         fos.write(s.getBytes());
         fos.flush();
         fos.close();
