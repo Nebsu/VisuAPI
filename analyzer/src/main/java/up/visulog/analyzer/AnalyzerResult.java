@@ -20,6 +20,6 @@ public class AnalyzerResult {
     }
 
     public String toHTML() throws IOException {
-        return "<html><body>"+subResults.stream().map(AnalyzerPlugin.Result::getResultAsHtmlDiv).reduce("", (acc, cur) -> acc + cur) + "</body></html>";
+        return "<html><link rel='stylesheet' type='text/css' href='test.css'><body>"+subResults.stream().map(AnalyzerPlugin.Result::getResultAsHtmlDiv).reduce("", (acc, cur) -> acc + cur) + "</body></html>";
     }
 }

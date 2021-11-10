@@ -1,0 +1,106 @@
+body{
+    background-color: white;
+    font-family: system-ui;
+}
+
+
+
+div.title{
+    font-size : 30;
+    text-align: center;
+    color: black;
+    padding-left: 1.5%;
+    padding-top : 0.25cm;
+    padding-bottom : 0.25cm;
+    margin-top: 22.5%;
+    margin-bottom: 22.5%;
+}
+
+
+h2{
+    background-color: white;
+    color: black;
+    padding-left: 1.5%;
+    padding-top : 0.25cm;
+    padding-bottom : 0.25cm;
+    
+}
+
+div.wiki{
+    padding-bottom: 5%;
+    padding-right: 10%;
+    padding-left: 10%;
+}
+
+div.statParMembres{
+    padding-bottom: 5%;
+    padding-right: 10%;
+    padding-left: 10%;
+}
+
+div.statMembres{
+    list-style-type: none;
+    display: flex;
+    justify-content: space-between;
+    padding-right : 2%;
+}
+
+div.globalStat{
+    padding-bottom: 5%;
+    padding-right: 10%;
+    padding-left: 10%;
+}
+
+div.branches{
+    text-align: center;
+}
+
+div.nbDeBranches{
+    font-size: 60;
+}
+
+div.tickets{
+    text-align: center;
+}
+
+div.nbDeTickets{
+    font-size: 60;
+}
+
+div.stats{
+    display: flex;
+}
+
+
+
+
+ul li{
+    list-style-type: none;
+    border-width:1px;
+    border-style:solid;
+    border-radius : 5px;
+    border-color:black;
+    padding-left: 5%;
+    padding-right: 5%;
+    padding-top: 0.25cm;
+    padding-bottom: 0.25cm;
+    text-align: center;
+}
+div.histoCommits{
+    padding-bottom: 5%;
+    padding-right: 10%;
+    padding-left: 10%;
+}
+
+table{
+    width : 100%;
+    table-layout:fixed;
+}
+
+table tr td{
+    text-align: center;
+    border-width:1px;
+    border-style:solid;
+    border-color:black;
+}
+
