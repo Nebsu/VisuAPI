@@ -15,6 +15,44 @@ public class CommitsParUtilisateur extends getAPI {
         super(project, token, adresse);
     }
 
+    private static String normalize(String source) {
+        String res = "";
+        for (int i=0; i<source.length(); i++) {
+            res += String.valueOf(Character.toUpperCase(source.charAt(i)));
+        }
+		return Normalizer.normalize(res, Normalizer.Form.NFD).replaceAll("[\u0300-\u036F]", "");
+	}
+
+    private static String[] divide(String source) {
+        String n1 = "", n2 = "";
+        int k = 0;
+        for (int i=0; i<source.length(); i++) {
+            char c = source.charAt(i);
+            if (c==' ') break;
+            n1 += String.valueOf(c);
+            k++;
+        }
+        for (int i=k+1; i<source.length(); i++) {
+            char c = source.charAt(i);
+            n2 += String.valueOf(c);
+        }
+        String[] res = {n1, n2};
+        return res;
+    }
+
+    private static boolean similarity(LinkedList<String> list, String n) {
+        n = CommitsParUtilisateur.normalize(n);
+        String[] words = CommitsParUtilisateur.divide(n);
+        for (String name : list) {
+            name = CommitsParUtilisateur.normalize(name);
+            String[] words2 = CommitsParUtilisateur.divide(name);
+            if (name.equals(words[0]) || name.equals(words[1]) || name.equals(n) ||
+                words[0].equals(words2[0]) || words[0].equals(words2[1]) || 
+                words[1].equals(words2[0]) || words[1].equals(words2[1])) return true;
+        }
+        return false;
+    }
+
     private LinkedList<String> recupererMembres() throws IOException, ParseException {
         try {   
             request("projects/"+String.valueOf(this.Project)+
@@ -32,19 +70,13 @@ public class CommitsParUtilisateur extends getAPI {
         return members;
     }
 
-    private static String removeAccent(String source) {
-		return Normalizer.normalize(source, Normalizer.Form.NFD).replaceAll("[\u0300-\u036F]", "");
-	}
-
     public int[] recupererCommits() throws IOException {
-        // LinkedList<String> users = recupererMembres();
         int acc = 1; // accumulateur de pages
         int acc2 = 0; // accumulateur de commits par page
-        boolean b = true;
-        LinkedList<String> users = new LinkedList<String>();
-        int[] nbCommits;
-        // LinkedList<String> detectedUsers = new LinkedList<String>();
+        LinkedList<String> users = new LinkedList<String>(); // liste des utilisateurs qui ont commit
+        int[] nbCommits; // nombre de commits par utilisateurs (chaque utilisateur a son index)
         do {
+            // request api :
             try {
                 request("projects/"+String.valueOf(this.Project)+
                 "/repository/commits", "all=true&per_page=50000&page="+String.valueOf(acc));
@@ -59,13 +91,9 @@ public class CommitsParUtilisateur extends getAPI {
                 for (Object user : commitArray) {
                     JSONObject temp = (JSONObject) user;
                     String name = temp.get("author_name").toString();
-                    String newName = "";
-                    for (int i=0; i<name.length(); i++) {
-                        newName += String.valueOf(Character.toUpperCase(name.charAt(i)));
-                    }
-                    newName = CommitsParUtilisateur.removeAccent(newName);
-                    if (!users.contains(newName)) {
-                        users.add(newName);
+                    name = CommitsParUtilisateur.normalize(name);
+                    if (!users.contains(name)) {
+                        users.add(name);
                     }
                     acc2++;
                 }
@@ -73,23 +101,35 @@ public class CommitsParUtilisateur extends getAPI {
                 for (Object user : commitArray) {
                     JSONObject temp = (JSONObject) user;
                     String name = temp.get("author_name").toString();
-                    String newName = "";
-                    for (int i=0; i<name.length(); i++) {
-                        newName += String.valueOf(Character.toUpperCase(name.charAt(i)));
-                    }
-                    newName = CommitsParUtilisateur.removeAccent(newName);
-                    if (users.contains(newName)) {
-                        nbCommits[users.indexOf(newName)]++;
+                    name = CommitsParUtilisateur.normalize(name);
+                    if (users.contains(name)) {
+                        nbCommits[users.indexOf(name)]++;
                     }
                 }
-                if (acc2<50000) b = false;
             } catch (ParseException e) {
                 System.out.println("Erreur ParseException");
                 return null;
             }
-        } while (b);
-        for (String user : users) {
-            System.out.println(user+" : "+nbCommits[users.indexOf(user)]+" commits");
+        } while (acc2>=50000);
+        try {
+            LinkedList<String> getOtherUsers = recupererMembres();
+            for (String user : getOtherUsers) {
+                if (!users.contains(user) && !CommitsParUtilisateur.similarity(users, user)) {
+                    users.add(user);
+                }
+            }
+            int indexOtherUsers = 0;
+            for (String user : users) {
+                System.out.println(user+" : "+nbCommits[users.indexOf(user)]+" commit(s)");
+                indexOtherUsers++;
+                if (indexOtherUsers==nbCommits.length) break;
+            }
+            for (int i=indexOtherUsers; i<users.size(); i++) {
+                System.out.println(users.get(i)+" : 0 commit");
+            }
+        } catch (ParseException e) {
+            System.out.println("Erreur ParseException");
+            return null;
         }
         return nbCommits;
         // commits?ref_name=master&all=true&per_page=100&page=x

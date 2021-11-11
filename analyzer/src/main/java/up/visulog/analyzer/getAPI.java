@@ -6,7 +6,7 @@ import java.util.Scanner;
 
 public abstract class getAPI {
     private String Token;
-    private int Project;
+    protected int Project;
     public String Adresse;
     // API : https://docs.gitlab.com/ee/api/api_resources.html
     
