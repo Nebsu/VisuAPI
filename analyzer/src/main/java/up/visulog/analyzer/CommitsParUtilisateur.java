@@ -15,6 +15,8 @@ public class CommitsParUtilisateur extends getAPI {
         super(project, token, adresse);
     }
 
+    // fonction qui va d'abord mettre toutes les lettres d'une chaine de caractères en majuscule
+    // et qui va ensuite enlever les accents
     private static String normalize(String source) {
         String res = "";
         for (int i=0; i<source.length(); i++) {
@@ -23,6 +25,9 @@ public class CommitsParUtilisateur extends getAPI {
 		return Normalizer.normalize(res, Normalizer.Form.NFD).replaceAll("[\u0300-\u036F]", "");
 	}
 
+    // fonction qui va diviser en deux mots, les chaines de caractères contenant un espace
+    // exemple : pour source = "Chapeau Melon", divide renvoie un tableau de String contenant deux éléments:
+    // "Chapeau" et "Melon"
     private static String[] divide(String source) {
         String n1 = "", n2 = "";
         int k = 0;
@@ -40,6 +45,8 @@ public class CommitsParUtilisateur extends getAPI {
         return res;
     }
 
+    // fonction qui va trouver des similarités entre un mot et un des éléments d'une liste de String
+    // exemple : similarty renvoie true si : n = "Michael Jordan" et si list contient une chaine comme "Jordan Michael"
     private static boolean similarity(LinkedList<String> list, String n) {
         n = CommitsParUtilisateur.normalize(n);
         String[] words = CommitsParUtilisateur.divide(n);
@@ -53,6 +60,7 @@ public class CommitsParUtilisateur extends getAPI {
         return false;
     }
 
+    // fonction qui récupère tous les membres inscrits sur le projet gitlab
     private LinkedList<String> recupererMembres() throws IOException, ParseException {
         try {   
             request("projects/"+String.valueOf(this.Project)+
@@ -70,6 +78,7 @@ public class CommitsParUtilisateur extends getAPI {
         return members;
     }
 
+    // fonction qui renvoie et affiche le nombre de commits par utilisateur
     public int[] recupererCommits() throws IOException {
         int acc = 1; // accumulateur de pages
         int acc2 = 0; // accumulateur de commits par page
@@ -88,30 +97,36 @@ public class CommitsParUtilisateur extends getAPI {
             JSONParser jsParser = new JSONParser();
             try {
                 JSONArray commitArray = (JSONArray) jsParser.parse(new FileReader("request.json"));
+                // Première lecture du fichier JSON, pour examiner l'auteur de chaque commit
                 for (Object user : commitArray) {
                     JSONObject temp = (JSONObject) user;
                     String name = temp.get("author_name").toString();
                     name = CommitsParUtilisateur.normalize(name);
                     if (!users.contains(name)) {
+                        // on ajoute seulement les utilisateurs qu'on a pas déjà ajouté
                         users.add(name);
                     }
                     acc2++;
                 }
+                // on sait désormais le nombre total d'utilisateurs, donc la taille du tableau final
                 nbCommits = new int[users.size()];
+                // Deuxieme lecture du tableau pour calculer le nombre de commit par auteur
                 for (Object user : commitArray) {
                     JSONObject temp = (JSONObject) user;
                     String name = temp.get("author_name").toString();
                     name = CommitsParUtilisateur.normalize(name);
                     if (users.contains(name)) {
-                        nbCommits[users.indexOf(name)]++;
+                        nbCommits[users.indexOf(name)]++; // accumulation de commit en fonction du nom de l'auteur
                     }
                 }
             } catch (ParseException e) {
                 System.out.println("Erreur ParseException");
                 return null;
             }
-        } while (acc2>=50000);
+        } while (acc2>=50000); // 50000 => limite arbitraire pour le nombre de commit maximum dans le fichier json
+        // s'il y a plus de 50000 commits dans le projet, on répète le programme tant qu'on a pas examiné tous les commits
         try {
+            // Determination des membres du projet qui sont inscrits, MAIS qui n'ont pas fait de commit
             LinkedList<String> getOtherUsers = recupererMembres();
             for (String user : getOtherUsers) {
                 if (!users.contains(user) && !CommitsParUtilisateur.similarity(users, user)) {
@@ -119,11 +134,13 @@ public class CommitsParUtilisateur extends getAPI {
                 }
             }
             int indexOtherUsers = 0;
+            // affichage du nombre de commit par utilisateur
             for (String user : users) {
                 System.out.println(user+" : "+nbCommits[users.indexOf(user)]+" commit(s)");
                 indexOtherUsers++;
                 if (indexOtherUsers==nbCommits.length) break;
             }
+            // affichage des membres qui n'ont pas fait de commit, s'il y en a :
             for (int i=indexOtherUsers; i<users.size(); i++) {
                 System.out.println(users.get(i)+" : 0 commit");
             }
@@ -131,8 +148,8 @@ public class CommitsParUtilisateur extends getAPI {
             System.out.println("Erreur ParseException");
             return null;
         }
-        return nbCommits;
-        // commits?ref_name=master&all=true&per_page=100&page=x
+        return nbCommits; 
+        // on revoit un tableau de int (pour le moment)
     }
 
     public static void main(String[] args) throws IOException {
