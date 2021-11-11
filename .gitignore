@@ -7,3 +7,5 @@ bin/
 .vscode/settings.json
 cli/example.html
 cli/request.json
+.vscode/
+request.json
