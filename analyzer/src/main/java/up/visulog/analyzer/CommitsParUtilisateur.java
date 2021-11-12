@@ -2,7 +2,11 @@ package up.visulog.analyzer;
 
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Map;
+import java.util.Set;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -11,12 +15,14 @@ import java.text.Normalizer;
 
 public class CommitsParUtilisateur extends getAPI {
 
+    // Constructeur :
     public CommitsParUtilisateur(int project, String token, String adresse) {
         super(project, token, adresse);
     }
 
-    // fonction qui va d'abord mettre toutes les lettres d'une chaine de caractères en majuscule
-    // et qui va ensuite enlever les accents
+    // Fonction auxiliaire qui va normaliser une chaine de caractères, c'est-à-dire
+    // qu'elle d'abord mettre toutes les lettres de la chaine en majuscule
+    // et qui va ensuite enlever ces accents (crée pour les noms propres)
     private static String normalize(String source) {
         String res = "";
         for (int i=0; i<source.length(); i++) {
@@ -25,9 +31,11 @@ public class CommitsParUtilisateur extends getAPI {
 		return Normalizer.normalize(res, Normalizer.Form.NFD).replaceAll("[\u0300-\u036F]", "");
 	}
 
-    // fonction qui va diviser en deux mots, les chaines de caractères contenant un espace
+    // Fonction auxiliaire qui va diviser en deux mots, les chaines de caractères contenant un espace
     // exemple : pour source = "Chapeau Melon", divide renvoie un tableau de String contenant deux éléments:
     // "Chapeau" et "Melon"
+    // Si la source ne contient pas d'espace (donc un seul mot) ou si elle contient plusieurs espaces (donc plus de deux mots), 
+    // alors on revoit null, car la source doit obligatoirement contenir un seul espace et exactement deux mots.
     private static String[] divide(String source) {
         String n1 = "", n2 = "";
         int k = 0;
@@ -37,20 +45,23 @@ public class CommitsParUtilisateur extends getAPI {
             n1 += String.valueOf(c);
             k++;
         }
+        if (k==source.length()) return null;
         for (int i=k+1; i<source.length(); i++) {
             char c = source.charAt(i);
+            if (c==' ') return null;
             n2 += String.valueOf(c);
         }
         String[] res = {n1, n2};
         return res;
     }
 
-    // fonction qui va trouver des similarités entre un mot et un des éléments d'une liste de String
-    // exemple : similarty renvoie true si : n = "Michael Jordan" et si list contient une chaine comme "Jordan Michael"
-    private static boolean similarity(LinkedList<String> list, String n) {
+    // Fonction auxiliaire qui va trouver des similarités entre un mot et un des éléments d'un set de String
+    // exemple : similarty renvoie true si : n = "Michael Jordan" et si set contient une chaine comme "Jordan Michael"
+    private static boolean similarity(Set<String> set, String n) {
         n = CommitsParUtilisateur.normalize(n);
         String[] words = CommitsParUtilisateur.divide(n);
-        for (String name : list) {
+        if (words==null) return false;
+        for (String name : set) {
             name = CommitsParUtilisateur.normalize(name);
             String[] words2 = CommitsParUtilisateur.divide(name);
             if (name.equals(words[0]) || name.equals(words[1]) || name.equals(n) ||
@@ -60,8 +71,31 @@ public class CommitsParUtilisateur extends getAPI {
         return false;
     }
 
-    // fonction qui récupère tous les membres inscrits sur le projet gitlab
-    private LinkedList<String> recupererMembres() throws IOException, ParseException {
+    // Fonction auxiliaire qui va inversers les deux mots d'une chaines de caractères contenant exactement un espace
+    // exemple : pour source = "Chapeau Melon", alors inverserMots renvoie la chaine : "Melon Chapeau".
+    // Si la source ne contient pas d'espace (donc un seul mot) ou si elle contient plusieurs espaces (donc plus de deux mots), 
+    // alors on revoit null, car la source doit obligatoirement contenir un seul espace et exactement deux mots.
+    private static String inverserMots(String source) {
+        String m1 = "", m2 = "";
+        int acc = 0;
+        for (int i=0; i<source.length(); i++) {
+            char c = source.charAt(i);
+            if (c==' ') break;
+            m1 += String.valueOf(c);
+            acc++;
+        }
+        if (acc==source.length()) return null;
+        for (int i=acc+1; i<source.length(); i++) {
+            char c = source.charAt(i);
+            if (c==' ') return null;
+            m2 += String.valueOf(c);
+        }
+        return (m2+" "+m1);
+    }
+
+    // Fonction auxiliaire qui récupère tous les membres inscrits sur le projet gitlab
+    // Les membres qui ont quitté le projet (même s'ils ont commit) ne sont donc pas concernés.
+    public LinkedList<String> recupererMembres() throws IOException, ParseException {
         try {   
             request("projects/"+String.valueOf(this.Project)+
             "/members/all", null);
@@ -78,86 +112,89 @@ public class CommitsParUtilisateur extends getAPI {
         return members;
     }
 
-    // fonction qui renvoie et affiche le nombre de commits par utilisateur
-    public int[] recupererCommits() throws IOException {
-        int acc = 1; // accumulateur de pages
-        int acc2 = 0; // accumulateur de commits par page
-        LinkedList<String> users = new LinkedList<String>(); // liste des utilisateurs qui ont commit
-        int[] nbCommits; // nombre de commits par utilisateurs (chaque utilisateur a son index)
+    // Fonction principale qui renvoie et affiche le nombre de commits par utilisateur
+    public Map<String, Object> recupererCommits() throws IOException {
+        // Renvoie une HashMap qui est un fait un array de Integer avec comme clé (index) le nom de l'utilisateur
+        // Par exemple map[THEAU NICOLAS] = 12 (12 est le nombre commits)
+        int page = 1; // accumulateur de pages
+        int nbCommits = 0; // accumulateur de commits par page
+        Map<String, Object> map = new HashMap<String, Object>(); // map principale
+        Set<String> users = new HashSet<String>(); // liste des auteurs des commits
         do {
-            // request api :
+            // Request API :
             try {
+                // On utilise la méthode de getAPI.java :
                 request("projects/"+String.valueOf(this.Project)+
-                "/repository/commits", "all=true&per_page=50000&page="+String.valueOf(acc));
+                "/repository/commits", "all=true&per_page=50000&page="+String.valueOf(page));
             } catch (Exception e) {
                 System.out.println("Erreur commits");
                 return null;
             }
-            acc++;
+            page++;
+            // Lecture du fichier JSON
             JSONParser jsParser = new JSONParser();
             try {
                 JSONArray commitArray = (JSONArray) jsParser.parse(new FileReader("request.json"));
-                // Première lecture du fichier JSON, pour examiner l'auteur de chaque commit
-                for (Object user : commitArray) {
-                    JSONObject temp = (JSONObject) user;
-                    String name = temp.get("author_name").toString();
-                    name = CommitsParUtilisateur.normalize(name);
-                    if (!users.contains(name)) {
-                        // on ajoute seulement les utilisateurs qu'on a pas déjà ajouté
+                // Examination de chaque commit :
+                for (Object commit : commitArray) {
+                    JSONObject temp = (JSONObject) commit; // commit courant
+                    String name = temp.get("author_name").toString(); // récupération du nom de l'auteur du commit
+                    name = CommitsParUtilisateur.normalize(name); // normalisation du nom
+                    if (users.contains(name) || users.contains(inverserMots(name))) { // cas où l'auteur est connu
+                        // Cas où le nom est inversé (bug gitlab de seb) :
+                        if (users.contains(inverserMots(name))) {
+                            name = inverserMots(name);
+                        }
+                        // Accumulation de commits en fonction du nom de l'auteur :
+                        Integer acc = (Integer) map.get(name);
+                        acc += Integer.valueOf(1);
+                        map.put(name, acc); 
+                    } else {
+                        // Cas où on détecte un nouvel utilisateur
                         users.add(name);
+                        map.put(name, Integer.valueOf(1)); // on ajoute son premier commit
                     }
-                    acc2++;
-                }
-                // on sait désormais le nombre total d'utilisateurs, donc la taille du tableau final
-                nbCommits = new int[users.size()];
-                // Deuxieme lecture du tableau pour calculer le nombre de commit par auteur
-                for (Object user : commitArray) {
-                    JSONObject temp = (JSONObject) user;
-                    String name = temp.get("author_name").toString();
-                    name = CommitsParUtilisateur.normalize(name);
-                    if (users.contains(name)) {
-                        nbCommits[users.indexOf(name)]++; // accumulation de commit en fonction du nom de l'auteur
-                    }
+                    nbCommits++;
                 }
             } catch (ParseException e) {
                 System.out.println("Erreur ParseException");
                 return null;
             }
-        } while (acc2>=50000); // 50000 => limite arbitraire pour le nombre de commit maximum dans le fichier json
+        // 50000 => limite arbitraire pour le nombre de commit maximum dans le fichier json
         // s'il y a plus de 50000 commits dans le projet, on répète le programme tant qu'on a pas examiné tous les commits
+        // affichage du nombre de commit par utilisateur
+        } while (nbCommits>=50000); 
+        // On ajoute les utilisateurs détectés dans la map :
+        map.put("users", users);
+        // On va ensuite récupérer la liste de tous les utilisateurs inscrits du projet :
         try {
-            // Determination des membres du projet qui sont inscrits, MAIS qui n'ont pas fait de commit
-            LinkedList<String> getOtherUsers = recupererMembres();
-            for (String user : getOtherUsers) {
-                if (!users.contains(user) && !CommitsParUtilisateur.similarity(users, user)) {
+            // On utilise la fonction auxiliaire recupererMembres() :
+            LinkedList<String> allUsers = recupererMembres();
+            for (String user : allUsers) {
+                // Cas où un utilisateur inscrit n'a pas commit :
+                if (!CommitsParUtilisateur.similarity(users, user)) {
                     users.add(user);
+                    map.put(user, Integer.valueOf(0)); // 0 commit car sinon on aurait détecté la personne avant
                 }
             }
-            int indexOtherUsers = 0;
-            // affichage du nombre de commit par utilisateur
-            for (String user : users) {
-                System.out.println(user+" : "+nbCommits[users.indexOf(user)]+" commit(s)");
-                indexOtherUsers++;
-                if (indexOtherUsers==nbCommits.length) break;
-            }
-            // affichage des membres qui n'ont pas fait de commit, s'il y en a :
-            for (int i=indexOtherUsers; i<users.size(); i++) {
-                System.out.println(users.get(i)+" : 0 commit");
-            }
         } catch (ParseException e) {
-            System.out.println("Erreur ParseException");
+            System.out.println("Erreur ParseException 2");
             return null;
         }
-        return nbCommits; 
-        // on revoit un tableau de int (pour le moment)
+        // Affichage du nombre de commits par utilisateur de tout le projet :
+        for (String string : users) {
+            Integer acc = (Integer) map.get(string);
+            int trueAcc = (int) acc;
+            System.out.println(string+" : "+trueAcc+" commit(s)");
+        }
+        return map; 
     }
 
+    // Tests :
     public static void main(String[] args) throws IOException {
         CommitsParUtilisateur p = new CommitsParUtilisateur(3389, "bVqyB1SzLYKnSi6u1cdM", 
         "https://gaufre.informatique.univ-paris-diderot.fr");
-        // CommitsParUtilisateur p2 = new CommitsParUtilisateur(278964, null, "https://gitlab.com");
         p.recupererCommits();
-        // p2.recupererCommits();
     }
 
 }
