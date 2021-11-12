@@ -147,11 +147,13 @@ public class CommitsParUtilisateur extends getAPI {
                         // Accumulation de commits en fonction du nom de l'auteur :
                         Integer acc = (Integer) map.get(name);
                         acc += Integer.valueOf(1);
+                        // MAJ de l'accumulateur :
                         map.put(name, acc); 
                     } else {
                         // Cas où on détecte un nouvel utilisateur
                         users.add(name);
-                        map.put(name, Integer.valueOf(1)); // on ajoute son premier commit
+                        // On ajoute l'utilisateur, ainsi que son premier commit :
+                        map.put(name, Integer.valueOf(1)); 
                     }
                     nbCommits++;
                 }
@@ -163,8 +165,6 @@ public class CommitsParUtilisateur extends getAPI {
         // s'il y a plus de 50000 commits dans le projet, on répète le programme tant qu'on a pas examiné tous les commits
         // affichage du nombre de commit par utilisateur
         } while (nbCommits>=50000); 
-        // On ajoute les utilisateurs détectés dans la map :
-        map.put("users", users);
         // On va ensuite récupérer la liste de tous les utilisateurs inscrits du projet :
         try {
             // On utilise la fonction auxiliaire recupererMembres() :
