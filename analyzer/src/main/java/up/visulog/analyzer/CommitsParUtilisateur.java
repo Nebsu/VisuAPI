@@ -45,10 +45,8 @@ public class CommitsParUtilisateur extends getAPI {
             n1 += String.valueOf(c);
             k++;
         }
-        if (k==source.length()) return null;
         for (int i=k+1; i<source.length(); i++) {
             char c = source.charAt(i);
-            if (c==' ') return null;
             n2 += String.valueOf(c);
         }
         String[] res = {n1, n2};
@@ -60,7 +58,6 @@ public class CommitsParUtilisateur extends getAPI {
     private static boolean similarity(Set<String> set, String n) {
         n = CommitsParUtilisateur.normalize(n);
         String[] words = CommitsParUtilisateur.divide(n);
-        if (words==null) return false;
         for (String name : set) {
             name = CommitsParUtilisateur.normalize(name);
             String[] words2 = CommitsParUtilisateur.divide(name);
@@ -84,10 +81,8 @@ public class CommitsParUtilisateur extends getAPI {
             m1 += String.valueOf(c);
             acc++;
         }
-        if (acc==source.length()) return null;
         for (int i=acc+1; i<source.length(); i++) {
             char c = source.charAt(i);
-            if (c==' ') return null;
             m2 += String.valueOf(c);
         }
         return (m2+" "+m1);
@@ -96,18 +91,22 @@ public class CommitsParUtilisateur extends getAPI {
     // Fonction auxiliaire qui récupère tous les membres inscrits sur le projet gitlab
     // Les membres qui ont quitté le projet (même s'ils ont commit) ne sont donc pas concernés.
     public LinkedList<String> recupererMembres() throws IOException, ParseException {
+        // Request API :
         try {   
             request("projects/"+String.valueOf(this.Project)+
             "/members/all", null);
         } catch (Exception e) {
             System.out.println("Erreur dans la récupération des membres");
         }
+        // Lecture du fichier JSON :
         LinkedList<String> members = new LinkedList<String>();
+        // On utilise JSON Parser :
         JSONParser jsParser = new JSONParser();
+        // Et JSON Array :
         JSONArray userArray = (JSONArray) jsParser.parse(new FileReader("request.json"));
         for (Object user : userArray) {
             JSONObject temp = (JSONObject) user;
-            members.add(temp.get("name").toString());
+            members.add(temp.get("name").toString()); // attribut name
         }
         return members;
     }
@@ -173,6 +172,7 @@ public class CommitsParUtilisateur extends getAPI {
             for (String user : allUsers) {
                 // Cas où un utilisateur inscrit n'a pas commit :
                 if (!CommitsParUtilisateur.similarity(users, user)) {
+                    user = normalize(user);
                     users.add(user);
                     map.put(user, Integer.valueOf(0)); // 0 commit car sinon on aurait détecté la personne avant
                 }
