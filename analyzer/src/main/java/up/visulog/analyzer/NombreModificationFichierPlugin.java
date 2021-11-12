@@ -170,7 +170,8 @@ public class NombreModificationFichierPlugin extends getAPI {
         }
         return res;
     }
-    public static void CreateHtmlPage(Map<String, Object> CommitsMap) {// convert hashmap to an HTML page
+    public void CreateHtmlPage() throws IOException {
+        Map<String, Object> CommitsMap= NombreModif();
         int NombredeCommits = (int) CommitsMap.get("Nombre");
         String html = "<!DOCTYPE html>\n" +
                 "<html>\n" +
