@@ -170,5 +170,56 @@ public class NombreModificationFichierPlugin extends getAPI {
         }
         return res;
     }
+    public static void CreateHtmlPage(Map<String, Object> CommitsMap) {// convert hashmap to an HTML page
+        int NombredeCommits = (int) CommitsMap.get("Nombre");
+        String html = "<!DOCTYPE html>\n" +
+                "<html>\n" +
+                "   <head>\n" +
+                "      <style>\n" +
+                "td {\n" +
+                "  text-align: center;\n" +
+                "}\n" +
+                "table {\nwidth:50% ;\n" +
+                "}\n" +
+                "  th, td {\n" +
+                "            border: 1px solid black;\n" +
+                "            height: 25px;\n" +
+                "         }\n" +
+                "      </style>\n" +
+                "   </head>\n" +
+                "\n" +
+                "   <body>\n" +
+                "   \n" +
+                "      <h1>Number of Commits " + NombredeCommits + "</h1>\n" +
+                "      <h2>" + "</h2>\n" +
+                "\n" +
+                "      <table style=\"width:100%;text-align:center;border-collapse:collapse;background-color:gold;\">\n" +
+                "         <tr style=\"background-color:#00FF00\">\n" +
+                "            <th colspan=\"2\">Table of Commits</th>\n" +
+                "         </tr>\n" +
+                "         <tr style=\"background-color:#00FF00\" >\n" +
+                "            <td>Commit's ID </td>\n" +
+                "            <td rowspan=\"1\">Commit's Parent ID</td>\n" +
+                "         </tr>\n";
+
+        ArrayList<String[]> IdCouples = (ArrayList<String[]>) CommitsMap.get("Commits");
+
+        for (int i = 0; i < IdCouples.size(); i++) {
+            String[] temp = IdCouples.get(i);
+            html = html + "<tr style=\"background-color:yellowgreen;color:white;\"><td>" + temp[0] + "</td>";
+            html = html + "<td>" + temp[1] + "</td></tr>";
+        }
+        html = html + "    </table>\n" +
+                "   </body>\n" +
+                "</html>";
+        File f = new File("./commits.html");
+        try {
+            BufferedWriter bw = new BufferedWriter(new FileWriter(f));
+            bw.write(html);
+            bw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
 }
