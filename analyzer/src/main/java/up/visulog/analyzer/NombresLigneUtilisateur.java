@@ -24,6 +24,7 @@ public class NombresLigneUtilisateur extends getAPI {
         Set<String> users = new HashSet<String>();
         int page = 1;
         int size = 0;
+        int[] total = new int[2];
         do {
             request("projects/" + this.Project + "/repository/commits", "with_stats=true&per_page=750&page=" + page);
             JSONParser jsonP = new JSONParser();
@@ -35,28 +36,35 @@ public class NombresLigneUtilisateur extends getAPI {
             for (Object commit : commits) {
                 JSONObject temp = (JSONObject) commit;
                 JSONObject erv = (JSONObject) temp.get("stats");
-                Object temp2 = erv.get("additions");
-                Object temp3 = erv.get("deletions");
-                String t = temp.get("author_name").toString();
-                if(users.contains(t)) {
-                    int[] temporaire = ((int[]) res.get(t));
-                    int[] ajouter = new int[2];
-                    ajouter[0] = temporaire[0] + ((Long) temp2).intValue();
-                    ajouter[1] = temporaire[1] + ((Long) temp3).intValue();
-                    res.put(t, ajouter);
-                }
-                else {
-                    users.add(t);
-                    int[] ajouter = new int[2];
-                    ajouter[0] = ((Long) temp2).intValue();
-                    ajouter[1] = ((Long) temp3).intValue();
-                    res.put(t, ajouter);
+                JSONArray tdyftugy = (JSONArray) temp.get("parent_ids");
+                int tailleParent = (int) tdyftugy.size();
+                if(tailleParent == 1) {
+                    Object temp2 = erv.get("additions");
+                    Object temp3 = erv.get("deletions");
+                    String t = temp.get("author_name").toString();
+                    if(users.contains(t)) {
+                        int[] temporaire = ((int[]) res.get(t));
+                        int[] ajouter = new int[2];
+                        ajouter[0] = temporaire[0] + ((Long) temp2).intValue();
+                        ajouter[1] = temporaire[1] + ((Long) temp3).intValue();
+                        res.put(t, ajouter);
+                    }
+                    else {
+                        users.add(t);
+                        int[] ajouter = new int[2];
+                        ajouter[0] = ((Long) temp2).intValue();
+                        ajouter[1] = ((Long) temp3).intValue();
+                        res.put(t, ajouter);
+                    }
+                    total[0] += ((Long) temp2).intValue();
+                    total[1] += ((Long) temp3).intValue();
                 }
             }
             page++;
             System.out.println(size);
         } while(size%750 == 0);
         res.put("users",users);
+        res.put("total",total);
         return res;
     }
 
@@ -66,11 +74,14 @@ public class NombresLigneUtilisateur extends getAPI {
             int[] tab =(int[]) map.get(string);
             System.out.println(string + "     additions : " + tab[0] + "    deletions : " + tab[1]);
         }
+        int[] total = (int[]) map.get("total");
+        int res = total[0] - total[1];
+        System.out.println("Nombres de lignes du projet : " + res);
     }
 
     public static void main(String[] args) throws IOException, ParseException {
-        //NombresLigneUtilisateur n2 = new NombresLigneUtilisateur("3389","8ax_oKvn8CMzvyPmxUD1","https://gaufre.informatique.univ-paris-diderot.fr");
-        NombresLigneUtilisateur n2 = new NombresLigneUtilisateur("278964","glpat-v5gGaWWxz_uXdK4MkY8K",null);
+        NombresLigneUtilisateur n2 = new NombresLigneUtilisateur("3389","8ax_oKvn8CMzvyPmxUD1","https://gaufre.informatique.univ-paris-diderot.fr");
+        //NombresLigneUtilisateur n2 = new NombresLigneUtilisateur("278964","glpat-v5gGaWWxz_uXdK4MkY8K",null);
         affiche(n2.getNombresLigneUtilisateur());
     }
     
