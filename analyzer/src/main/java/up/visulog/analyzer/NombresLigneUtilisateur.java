@@ -14,9 +14,11 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 public class NombresLigneUtilisateur extends getAPI {
+    private boolean principal;
 
-    public NombresLigneUtilisateur(String project, String token, String adresse) {
+    public NombresLigneUtilisateur(String project, String token, String adresse,boolean principal) {
         super(project, token, adresse);
+        this.principal = principal;
     }
     
     public Map<String, Object> getNombresLigneUtilisateur() throws IOException, ParseException {
@@ -26,7 +28,7 @@ public class NombresLigneUtilisateur extends getAPI {
         int size = 0;
         int[] total = new int[2];
         do {
-            request("projects/" + this.Project + "/repository/commits", "with_stats=true&per_page=750&page=" + page);
+            request("projects/" + this.Project + "/repository/commits", principal? "with_stats=true&per_page=750&page=" + page : "all=true&with_stats=true&per_page=750&page=" + page);
             JSONParser jsonP = new JSONParser();
             JSONArray commits = (JSONArray) jsonP.parse(new FileReader("request.json"));
             if(commits.size() == 0) {
@@ -80,7 +82,7 @@ public class NombresLigneUtilisateur extends getAPI {
     }
 
     public static void main(String[] args) throws IOException, ParseException {
-        NombresLigneUtilisateur n2 = new NombresLigneUtilisateur("3389","8ax_oKvn8CMzvyPmxUD1","https://gaufre.informatique.univ-paris-diderot.fr");
+        NombresLigneUtilisateur n2 = new NombresLigneUtilisateur("3389","8ax_oKvn8CMzvyPmxUD1","https://gaufre.informatique.univ-paris-diderot.fr",true);
         //NombresLigneUtilisateur n2 = new NombresLigneUtilisateur("278964","glpat-v5gGaWWxz_uXdK4MkY8K",null);
         affiche(n2.getNombresLigneUtilisateur());
     }
