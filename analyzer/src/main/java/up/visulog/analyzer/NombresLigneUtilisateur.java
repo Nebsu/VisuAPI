@@ -2,7 +2,6 @@ package up.visulog.analyzer;
 
 import java.io.FileReader;
 import java.io.IOException;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -12,6 +11,18 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+
+/****************************************************************
+UTILISATION :
+
+- Creation d'un Object NombresLigneUtilisateur avec en argument(ID projet, Token si existant sinon null, Adresse de l'herbegement du projet, False pour tout les commits ou True pour les commits de la branche principale).
+- Appel de la fonction getNombresLigneUtilisateu() qui renvoi une Map<String, Object>:
+    - Avec une clé "users" un liste de tout les utilisateurs qui on commit dans le projet.
+    - Des clés qui seront les nom d'utilisateur qui va renvoyer un tableau d'int avec t[0] = addition et t[1] = deletions.
+    - Avec une clé "total" qui renvoi un tableau d'int avec t[0] = nombre de lignes ajouté et t[1] = nombre de ligne supprimé.
+- Affiche permet d'afficher la la map en entier dans le terminal.
+
+****************************************************************/
 
 public class NombresLigneUtilisateur extends getAPI {
     private boolean principal;
@@ -36,28 +47,26 @@ public class NombresLigneUtilisateur extends getAPI {
             }
             size += commits.size();
             for (Object commit : commits) {
-                JSONObject temp = (JSONObject) commit;
-                JSONObject erv = (JSONObject) temp.get("stats");
-                JSONArray tdyftugy = (JSONArray) temp.get("parent_ids");
-                int tailleParent = (int) tdyftugy.size();
+                JSONObject objectTemp1 = (JSONObject) commit;
+                JSONObject objectTemp2 = (JSONObject) objectTemp1.get("stats");
+                JSONArray objectTemp3 = (JSONArray) objectTemp1.get("parent_ids");
+                int tailleParent = (int) objectTemp3.size();
                 if(tailleParent == 1) {
-                    Object temp2 = erv.get("additions");
-                    Object temp3 = erv.get("deletions");
-                    String t = temp.get("author_name").toString();
+                    Object temp2 = objectTemp2.get("additions");
+                    Object temp3 = objectTemp2.get("deletions");
+                    String t = objectTemp1.get("author_name").toString();
+                    int[] ajouter = new int[2];
                     if(users.contains(t)) {
                         int[] temporaire = ((int[]) res.get(t));
-                        int[] ajouter = new int[2];
                         ajouter[0] = temporaire[0] + ((Long) temp2).intValue();
                         ajouter[1] = temporaire[1] + ((Long) temp3).intValue();
-                        res.put(t, ajouter);
                     }
                     else {
-                        users.add(t);
-                        int[] ajouter = new int[2];
+                        users.add(t);                    
                         ajouter[0] = ((Long) temp2).intValue();
                         ajouter[1] = ((Long) temp3).intValue();
-                        res.put(t, ajouter);
                     }
+                    res.put(t, ajouter);
                     total[0] += ((Long) temp2).intValue();
                     total[1] += ((Long) temp3).intValue();
                 }

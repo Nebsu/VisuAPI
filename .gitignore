@@ -9,3 +9,5 @@ cli/example.html
 cli/request.json
 .vscode/
 request.json
+.idea/
+example.html
