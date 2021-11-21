@@ -163,8 +163,6 @@ public class CommitsParUtilisateur extends getAPI {
         // s'il y a plus de 50000 commits dans le projet, on répète le programme tant qu'on a pas examiné tous les commits
         // affichage du nombre de commit par utilisateur
         } while (nbCommits>=50000); 
-        // On ajoute les utilisateurs détectés dans la map :
-        map.put("users", users);
         // On va ensuite récupérer la liste de tous les utilisateurs inscrits du projet :
         try {
             // On utilise la fonction auxiliaire recupererMembres() :
@@ -181,12 +179,7 @@ public class CommitsParUtilisateur extends getAPI {
             System.out.println("Erreur ParseException 2");
             return null;
         }
-        // Affichage du nombre de commits par utilisateur de tout le projet :
-        for (String string : users) {
-            Integer acc = (Integer) map.get(string);
-            int trueAcc = (int) acc;
-            System.out.println(string+" : "+trueAcc+" commit(s)");
-        }
+
         return map; 
     }
 
