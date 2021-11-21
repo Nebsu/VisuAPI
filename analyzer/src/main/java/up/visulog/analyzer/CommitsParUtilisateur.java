@@ -147,11 +147,13 @@ public class CommitsParUtilisateur extends getAPI {
                         // Accumulation de commits en fonction du nom de l'auteur :
                         Integer acc = (Integer) map.get(name);
                         acc += Integer.valueOf(1);
+                        // MAJ de l'accumulateur :
                         map.put(name, acc); 
                     } else {
                         // Cas où on détecte un nouvel utilisateur
                         users.add(name);
-                        map.put(name, Integer.valueOf(1)); // on ajoute son premier commit
+                        // On ajoute l'utilisateur, ainsi que son premier commit :
+                        map.put(name, Integer.valueOf(1)); 
                     }
                     nbCommits++;
                 }
