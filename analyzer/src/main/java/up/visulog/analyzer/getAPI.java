@@ -6,40 +6,68 @@ import java.util.Scanner;
 
 public abstract class getAPI {
     private String Token;
-    protected int Project;
+    protected String Project;
     public String Adresse;
-    // API : https://docs.gitlab.com/ee/api/api_resources.html
-    
-    public getAPI(int project,String token,String adresse) {
-        this.Adresse = adresse;
-        while(!testAdresse()) {
-            this.Adresse = scan();
+
+    public getAPI(String project,String token,String adresse) {
+        setAdresse(adresse);
+        setToken(token);
+        setProject(project);
+    }
+
+    public void setAdresse(String adresse) {
+        if(adresse == null) {
+            Adresse = "https://gitlab.com";
         }
-        this.Token = token;
-        while(!testToken()) {
-            this.Token = scan();
-        }
-        this.Project = project;
-        while(!testProject()) {
-            try {
-                this.Project = Integer.parseInt(scan());
-            }
-            catch (Exception e) {
-                System.out.println("Veuillez entré des chiffres");
+        else {
+            Adresse = adresse;
+            if(!testAdresse()) {
+                setAdresse(scan());
             }
         }
     }
 
-    public static void main(String[] args) throws IOException {
-        //URL url = new URL("https://gaufre.informatique.univ-paris-diderot.fr/api/v4/groups/1711/members/?private_token=8ax_oKvn8CMzvyPmxUD1");
-        // URL url = new URL("https://gitlab.com/api/v4/projects/278964");
-        // InputStream is = url.openConnection().getInputStream();
-        // BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        // String line = null;
-        // while ((line = reader.readLine()) != null) {
-        //     System.out.println(line);
-        // }
-        // reader.close();
+    public void setToken(String token) {
+        if(token != null) {
+            Token = token;
+            if(!testToken()) {
+                String s = scan();
+                if(s == null) {
+                    Token = null;
+                }
+                else if(s.equals("a") || s.equals("A")) {
+                    System.out.println("Indiquez votre adresse :");
+                    setAdresse(scan());
+                    setToken(token);
+                }
+                else {
+                    setToken(s);
+                }
+            }
+        }
+    }
+
+    public void setProject(String project) {
+        this.Project = project;        
+        if(!testProject()) {
+            String s = scan();
+            if(s == null) {
+                setProject(s);
+            }
+            else if(s.equals("a") || s.equals("A")) {
+                System.out.println("Indiquez votre adresse :");
+                setAdresse(scan());
+                setProject(project);
+            }
+            else if(s.equals("t") || s.equals("T")) {
+                System.out.println("Indiquez votre token :");
+                setToken(scan());
+                setProject(project);
+            }
+            else {
+                setProject(s);
+            }
+        }
     }
 
     public boolean testAdresse() {
@@ -49,10 +77,12 @@ public abstract class getAPI {
         }
         catch (Exception e) {
             if(e.toString().substring(0,31).equals("java.net.MalformedURLException:")) {
-                System.out.println("Adresse invalide, veuillez inserer un URL du type: https://gitlab.com ou appuyer sur entré pour utiliser https://gitlab.com");
+                System.out.println("Adresse invalide.");
+                System.out.println("Veuillez inserer un URL du type: https://gitlab.com ou appuyer sur entré pour utiliser https://gitlab.com");
             }
             else {
-                System.out.println("Erreur de connexion verifier votre connexion internet et réinserer votre URL");
+                System.out.println("URL invalide ou erreur de connexion.");
+                System.out.println("Veuillez réinserer l'URL");
             }
             return false;
         }
@@ -61,11 +91,22 @@ public abstract class getAPI {
 
     public boolean testToken() {
         try {
-            URL url = new URL(this.Adresse + "/api/v4/projects?private_token=" + this.Token);
-            url.openConnection().getInputStream();
+            if(this.Token == null) {
+                return true;
+            }
+            else {
+                URL url = new URL(this.Adresse + "/api/v4/projects?private_token=" + this.Token);
+                url.openConnection().getInputStream();
+            }
         }
         catch (Exception e) {
-            System.out.println("Clé invalide, Veuillez réinserer une clé valide ou appuyez sur entrée pour ne pas utiliser de clé.");
+            System.out.println();
+            System.out.println("Clé invalide. Veuillez :");
+            System.out.println("- Réinsérer une clé valide");
+            System.out.println("ou");
+            System.out.println("-Entrer \"A\" pour changer l'adresse");
+            System.out.println("ou");
+            System.out.println("-Laisser vide pour ne pas présenter de clé ");
             return false;
         }
         return true;
@@ -73,11 +114,23 @@ public abstract class getAPI {
 
     public boolean testProject() {
         try {
-            URL url = new URL(this.Adresse + "/api/v4/projects/" + this.Project + "?private_token=" + this.Token);
-            url.openConnection().getInputStream();
+            if(this.Token == null) {
+                URL url = new URL(this.Adresse + "/api/v4/projects/" + this.Project);
+                url.openConnection().getInputStream();
+            }
+            else {
+                URL url = new URL(this.Adresse + "/api/v4/projects/" + this.Project + "?private_token=" + this.Token);
+                url.openConnection().getInputStream();
+            }
         }
         catch (Exception e) {
-            System.out.println("ID de projet invalide veuillez réinserer l'ID.");
+            System.out.println();
+            System.out.println("ID de projet invalide. Veuillez :");
+            System.out.println("- Réinsérer un ID valide");
+            System.out.println("ou");
+            System.out.println("- Entrer \"A\" pour changer l'adresse");
+            System.out.println("ou");
+            System.out.println("- Entrer \"T\" pour changer le token");
             return false;
         }
         return true;

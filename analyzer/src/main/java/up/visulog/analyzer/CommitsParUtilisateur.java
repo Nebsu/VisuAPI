@@ -15,7 +15,7 @@ import java.text.Normalizer;
 public class CommitsParUtilisateur extends getAPI {
 
     // Constructeur :
-    public CommitsParUtilisateur(int project, String token, String adresse) {
+    public CommitsParUtilisateur(String project, String token, String adresse) {
         super(project, token, adresse);
     }
 
@@ -29,28 +29,6 @@ public class CommitsParUtilisateur extends getAPI {
         }
 		return Normalizer.normalize(res, Normalizer.Form.NFD).replaceAll("[\u0300-\u036F]", "");
 	}
-
-    // Fonction auxiliaire qui va diviser en deux mots, les chaines de caractères contenant un espace
-    // exemple : pour source = "Chapeau Melon", divide renvoie un tableau de String contenant deux éléments:
-    // "Chapeau" et "Melon"
-    // Si la source ne contient pas d'espace (donc un seul mot) ou si elle contient plusieurs espaces (donc plus de deux mots), 
-    // alors on revoit null, car la source doit obligatoirement contenir un seul espace et exactement deux mots.
-    private static String[] divide(String source) {
-        String n1 = "", n2 = "";
-        int k = 0;
-        for (int i=0; i<source.length(); i++) {
-            char c = source.charAt(i);
-            if (c==' ') break;
-            n1 += String.valueOf(c);
-            k++;
-        }
-        for (int i=k+1; i<source.length(); i++) {
-            char c = source.charAt(i);
-            n2 += String.valueOf(c);
-        }
-        String[] res = {n1, n2};
-        return res;
-    }
 
     // Fonction auxiliaire qui va inversers les deux mots d'une chaines de caractères contenant exactement un espace
     // exemple : pour source = "Chapeau Melon", alors inverserMots renvoie la chaine : "Melon Chapeau".
@@ -72,6 +50,13 @@ public class CommitsParUtilisateur extends getAPI {
         return (m2+" "+m1);
     }
 
+    // Fonction auxiliaire pour afficher le nombre de commits par utilisateur dans le terminal
+    private static void afficher(Map<String, Object> m) {
+        for (var item : m.entrySet()) {
+            System.out.println(item.getKey() + " : " + item.getValue()+" commit(s)");
+        }
+    }
+
     // Fonction principale qui renvoie et affiche le nombre de commits par utilisateur
     public Map<String, Object> recupererCommits() throws IOException {
         // Renvoie une HashMap qui est un fait un array de Integer avec comme clé (index) le nom de l'utilisateur
@@ -81,11 +66,12 @@ public class CommitsParUtilisateur extends getAPI {
         Map<String, Object> map = new HashMap<String, Object>(); // map principale
         Set<String> users = new HashSet<String>(); // liste des auteurs des commits
         do {
+            nbCommits = 0;
             // Request API :
             try {
                 // On utilise la méthode de getAPI.java :
                 request("projects/"+String.valueOf(this.Project)+
-                "/repository/commits", "all=true&per_page=50000&page="+String.valueOf(page));
+                "/repository/commits", "all=true&per_page=1000&page="+String.valueOf(page));
             } catch (Exception e) {
                 System.out.println("Erreur commits");
                 return null;
@@ -122,18 +108,26 @@ public class CommitsParUtilisateur extends getAPI {
                 System.out.println("Erreur ParseException");
                 return null;
             }
-        // 50000 => limite arbitraire pour le nombre de commit maximum dans le fichier json
-        // s'il y a plus de 50000 commits dans le projet, on répète le programme tant qu'on a pas examiné tous les commits
+        System.out.println("Page "+page);
+        } while (nbCommits>=1000);
+        // 1000 => limite arbitraire pour le nombre de commit maximum dans le fichier json
+        // s'il y a plus de 1000 commits dans le projet, on répète le programme tant qu'on a pas examiné tous les commits
         // affichage du nombre de commit par utilisateur
-        } while (nbCommits>=50000);
+        System.out.println();
+        afficher(map);
         return map; 
     }
 
     // Tests :
     public static void main(String[] args) throws IOException {
-        CommitsParUtilisateur p = new CommitsParUtilisateur(3389, "bVqyB1SzLYKnSi6u1cdM", 
+        CommitsParUtilisateur p = new CommitsParUtilisateur("3389", "bVqyB1SzLYKnSi6u1cdM", 
         "https://gaufre.informatique.univ-paris-diderot.fr");
         p.recupererCommits();
+        CommitsParUtilisateur p2 = new CommitsParUtilisateur("3390", null, 
+        "https://gaufre.informatique.univ-paris-diderot.fr");
+        p2.recupererCommits();
+        CommitsParUtilisateur p3 = new CommitsParUtilisateur("2335175", null, null);
+        p3.recupererCommits();
     }
 
 }

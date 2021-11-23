@@ -125,7 +125,7 @@ public class CommitsParUtilisateurHTML{
     }
 
     public static void main(String[] args) throws IOException {
-        CommitsParUtilisateur p = new CommitsParUtilisateur(3389, "bVqyB1SzLYKnSi6u1cdM", 
+        CommitsParUtilisateur p = new CommitsParUtilisateur("3389", "bVqyB1SzLYKnSi6u1cdM", 
         "https://gaufre.informatique.univ-paris-diderot.fr");
         CommitsParUtilisateurHTML c = new CommitsParUtilisateurHTML(p.recupererCommits());
         c.creerCss(c.cssGenerator());
