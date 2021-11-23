@@ -4,7 +4,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 import org.json.simple.JSONArray;
@@ -53,21 +52,6 @@ public class CommitsParUtilisateur extends getAPI {
         return res;
     }
 
-    // Fonction auxiliaire qui va trouver des similarités entre un mot et un des éléments d'un set de String
-    // exemple : similarty renvoie true si : n = "Michael Jordan" et si set contient une chaine comme "Jordan Michael"
-    private static boolean similarity(Set<String> set, String n) {
-        n = CommitsParUtilisateur.normalize(n);
-        String[] words = CommitsParUtilisateur.divide(n);
-        for (String name : set) {
-            name = CommitsParUtilisateur.normalize(name);
-            String[] words2 = CommitsParUtilisateur.divide(name);
-            if (name.equals(words[0]) || name.equals(words[1]) || name.equals(n) ||
-                words[0].equals(words2[0]) || words[0].equals(words2[1]) || 
-                words[1].equals(words2[0]) || words[1].equals(words2[1])) return true;
-        }
-        return false;
-    }
-
     // Fonction auxiliaire qui va inversers les deux mots d'une chaines de caractères contenant exactement un espace
     // exemple : pour source = "Chapeau Melon", alors inverserMots renvoie la chaine : "Melon Chapeau".
     // Si la source ne contient pas d'espace (donc un seul mot) ou si elle contient plusieurs espaces (donc plus de deux mots), 
@@ -86,29 +70,6 @@ public class CommitsParUtilisateur extends getAPI {
             m2 += String.valueOf(c);
         }
         return (m2+" "+m1);
-    }
-
-    // Fonction auxiliaire qui récupère tous les membres inscrits sur le projet gitlab
-    // Les membres qui ont quitté le projet (même s'ils ont commit) ne sont donc pas concernés.
-    public LinkedList<String> recupererMembres() throws IOException, ParseException {
-        // Request API :
-        try {   
-            request("projects/"+String.valueOf(this.Project)+
-            "/members/all", null);
-        } catch (Exception e) {
-            System.out.println("Erreur dans la récupération des membres");
-        }
-        // Lecture du fichier JSON :
-        LinkedList<String> members = new LinkedList<String>();
-        // On utilise JSON Parser :
-        JSONParser jsParser = new JSONParser();
-        // Et JSON Array :
-        JSONArray userArray = (JSONArray) jsParser.parse(new FileReader("request.json"));
-        for (Object user : userArray) {
-            JSONObject temp = (JSONObject) user;
-            members.add(temp.get("name").toString()); // attribut name
-        }
-        return members;
     }
 
     // Fonction principale qui renvoie et affiche le nombre de commits par utilisateur
@@ -164,24 +125,7 @@ public class CommitsParUtilisateur extends getAPI {
         // 50000 => limite arbitraire pour le nombre de commit maximum dans le fichier json
         // s'il y a plus de 50000 commits dans le projet, on répète le programme tant qu'on a pas examiné tous les commits
         // affichage du nombre de commit par utilisateur
-        } while (nbCommits>=50000); 
-        // On va ensuite récupérer la liste de tous les utilisateurs inscrits du projet :
-        try {
-            // On utilise la fonction auxiliaire recupererMembres() :
-            LinkedList<String> allUsers = recupererMembres();
-            for (String user : allUsers) {
-                // Cas où un utilisateur inscrit n'a pas commit :
-                if (!CommitsParUtilisateur.similarity(users, user)) {
-                    user = normalize(user);
-                    users.add(user);
-                    map.put(user, Integer.valueOf(0)); // 0 commit car sinon on aurait détecté la personne avant
-                }
-            }
-        } catch (ParseException e) {
-            System.out.println("Erreur ParseException 2");
-            return null;
-        }
-
+        } while (nbCommits>=50000);
         return map; 
     }
 
