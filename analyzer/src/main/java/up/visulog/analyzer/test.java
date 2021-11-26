@@ -4,14 +4,11 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 
 public class test extends getAPI {
 
-    public test(int project,String token,String adresse) {
+    public test(String project,String token,String adresse) {
         super(project,token,adresse);
     }
 
@@ -29,17 +26,16 @@ public class test extends getAPI {
         return name;
     }
 
-        // JSONParser jsonP = new JSONParser();
-        // try {
-        //     JSONObject jsonO = (JSONObject) jsonP.parse(new FileReader("C:/Users/theau/OneDrive/Cours/2021/PP/visulog/analyzer/src/main/java/up/visulog/analyzer/test.json"));
-        //     Object name = jsonO.get("compare_timeout");
-        //     System.out.println("Name :" + name);
-        // } catch (FileNotFoundException e) {
-        //     e.printStackTrace();
-        // } catch (IOException e) {
-        //     e.printStackTrace();
-        // }
-
-
+    //  JSONParser jsonP = new JSONParser();
+    //  try {
+    //      JSONObject jsonO = (JSONObject) jsonP.parse(new FileReader
+    //      ("C:/Users/theau/OneDrive/Cours/2021/PP/visulog/analyzer/src/main/java/up/visulog/analyzer/test.json"));
+    //     Object name = jsonO.get("compare_timeout");
+    //     System.out.println("Name :" + name);
+    // } catch (FileNotFoundException e) {
+    //     e.printStackTrace();
+    // } catch (IOException e) {
+    //     e.printStackTrace();
+    // }
 
 }

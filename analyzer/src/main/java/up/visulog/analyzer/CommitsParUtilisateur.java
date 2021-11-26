@@ -1,7 +1,6 @@
 package up.visulog.analyzer;
 
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -11,12 +10,18 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import java.text.Normalizer;
+import java.util.Random;
+import java.awt.Desktop;
 
 public class CommitsParUtilisateur extends getAPI {
 
+    private Map<String, Object> result;
+
     // Constructeur :
-    public CommitsParUtilisateur(String project, String token, String adresse) {
+    public CommitsParUtilisateur(String project, String token, String adresse) 
+    throws IOException {
         super(project, token, adresse);
+        this.result = this.recupererCommits();
     }
 
     // Fonction auxiliaire qui va normaliser une chaine de caractères, c'est-à-dire
@@ -108,7 +113,6 @@ public class CommitsParUtilisateur extends getAPI {
                 System.out.println("Erreur ParseException");
                 return null;
             }
-        System.out.println("Page "+page);
         } while (nbCommits>=1000);
         // 1000 => limite arbitraire pour le nombre de commit maximum dans le fichier json
         // s'il y a plus de 1000 commits dans le projet, on répète le programme tant qu'on a pas examiné tous les commits
@@ -118,16 +122,124 @@ public class CommitsParUtilisateur extends getAPI {
         return map; 
     }
 
+    ///////////////////////////TEMPORAIRE///////////////////////////////////////
+    public void creerCss(String s) throws IOException {
+        File f = new File("pie.css");
+        FileOutputStream fos = new FileOutputStream("pie.css");
+        if(f.exists()) {
+            f.delete();
+        }
+        fos.write(s.getBytes());
+        fos.flush();
+        fos.close();
+    }
+
+    public void creer(String s) throws IOException {
+        File f = new File("example.html");
+        FileOutputStream fos = new FileOutputStream("example.html");
+        if(f.exists()) {
+            f.delete();
+        }
+        fos.write(s.getBytes());
+        fos.flush();
+        fos.close();
+    }
+
+    public void ouvrirPage() throws IOException {
+        File f = new File("example.html");
+        if(!Desktop.isDesktopSupported()){
+            System.out.println("Desktop n'est pas prise en charge");
+            return;
+        }
+        Desktop d = Desktop.getDesktop();
+        d.open(f);
+    }
+    //////////////////////////////////////////////////////////////////////////////
+
+    //Creation du code html
+    public String toHTML(){
+        String s = "<html><body><h1>Nombre de Commits par Utilisateur</h1>";
+        for(var item : result.entrySet()){
+            s += "<li>"+item.getKey()+": "+item.getValue()+"</li>";
+        }
+        return s + "</body></html>";
+    }
+
+    public double[] getCommitsPercentile(){
+        double[] res = new double[result.size()];
+        int total = 0;
+        int i = 0;
+        for(var item : result.entrySet()){
+            total += (int)item.getValue();
+        }
+        for(var item : result.entrySet()){
+            res[i] = (double)(int)item.getValue()*100/total;
+            i=i+1;
+        }      
+        return res;
+    }
+
+    public String colorGenerator(){
+        Random obj = new Random();
+        int rand_num = obj.nextInt(0xffffff + 1);
+        String colorCode = String.format("#%06x", rand_num);
+        return colorCode;
+    }
+
+    public String createHTMLChart() {
+        StringBuilder html = new StringBuilder("<html><link rel=\"stylesheet\" href=\"pie.css\"><body><h1>Commit Proportion Pie Chart</h1><div id=\"my-pie-chart-container\"><div id=\"my-pie-chart\"></div><div id=\"legenda\">");
+        int i = 0;
+        for (var item : result.entrySet()) {
+            i = i+1;
+            String divId = "color-" + i;
+            html.append("<div class=\"entry\">").append("<div id=\"").append(divId).append("\" class=\"entry-color\"></div>").append("<div class=\"entry-text\">").append(item.getKey()+" ").append(item.getValue()).append("</div></div>");
+        }
+        html.append("</div></div></body></html>");
+        return html.toString();
+    }
+
+    public String cssGenerator(){
+        StringBuilder css = new StringBuilder("body {background-color: white;display: flex;justify-content: center;align-items: center;flex-direction: column;}#my-pie-chart-container {display: flex;align-items: center;}  #my-pie-chart {background: conic-gradient(");
+        double[]tab = getCommitsPercentile();
+        String[]colorMem = new String[tab.length];
+        int mem = 0;
+        int percentile = 0;
+        for(int j = 0; j < colorMem.length; j++){
+            colorMem[j] = colorGenerator();
+        }
+        for(int i = 0; i < tab.length; i++){
+            percentile += tab[i];
+            css.append(colorMem[i] + " " + mem + "%" + " " + percentile + "%");
+            if(i != tab.length - 1){
+                css.append(", ");
+            }
+            mem = percentile;
+        }
+        css.append(");border-radius: 50%;width: 150px;height: 150px;}#legenda {margin-left: 20px;background-color: white;padding: 5px;}.entry {display: flex;align-items: center;}.entry-color {height: 10px;width: 10px;}.entry-text {margin-left: 5px;}");
+        int i = 0;
+        for(int j = 0; j < colorMem.length; j++){
+            i = i+1;
+            css.append("#color-"+i).append("{background-color:").append(colorMem[j]+ ";}");
+        }
+        return css.toString();
+    }
+
+    public void afficherGraphique() throws IOException {
+        this.creerCss(this.cssGenerator());
+        this.creer(this.createHTMLChart());
+        this.ouvrirPage();
+    }
+
     // Tests :
     public static void main(String[] args) throws IOException {
         CommitsParUtilisateur p = new CommitsParUtilisateur("3389", "bVqyB1SzLYKnSi6u1cdM", 
         "https://gaufre.informatique.univ-paris-diderot.fr");
-        p.recupererCommits();
+        p.afficherGraphique();
         CommitsParUtilisateur p2 = new CommitsParUtilisateur("3390", null, 
         "https://gaufre.informatique.univ-paris-diderot.fr");
-        p2.recupererCommits();
-        CommitsParUtilisateur p3 = new CommitsParUtilisateur("2335175", null, null);
-        p3.recupererCommits();
+        p2.afficherGraphique();
+        // CommitsParUtilisateur p3 = new CommitsParUtilisateur("2335175", null, null);
+        // p3.recupererCommits();
     }
 
 }
