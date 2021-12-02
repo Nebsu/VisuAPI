@@ -52,7 +52,7 @@ public class CountCommitsPerAuthorPlugin implements AnalyzerPlugin {
             
             //CHOIX DU PLUGIN
 
-            String plugin = "historique de commits";
+            String plugin = "statistiques edit";
 
             // ACCUEIL AVEC TITRE
             StringBuilder html = new StringBuilder("<div class='title'><h1> Statistiques du projet : X </h1> <br> via Gitlab <div class='img'><img src='https://about.gitlab.com/images/press/logo/png/gitlab-icon-rgb.png' width='50' height='50'></div></div>");
@@ -62,7 +62,6 @@ public class CountCommitsPerAuthorPlugin implements AnalyzerPlugin {
             pourcentage = (int)(Math.random()*100);
             
             html.append("<div class='bar'><div class='percentage has-tip'  style='width: "+pourcentage+"%' data-perc='"+pourcentage+"%'></div></div>");
-            html.append("<p>"+pourcentage+"</p>");
 
             //if(pourcentage <100){
                 //html.append("<meta http-equiv='refresh' content='3'>");
@@ -77,10 +76,17 @@ public class CountCommitsPerAuthorPlugin implements AnalyzerPlugin {
             // MEMBRES ET NOMBRES DE COMMITS
             if(plugin=="nombre de commits"){
                 html.append("<div class='statParMembres'><h2>Statistiques par membres</h2> <ul> <div class='statMembres'>");
+                int acc = 0;
                 for (var item : commitsPerAuthor.entrySet()) {
+                    acc++;
+                    System.out.println(acc);
                     html.append("<li><div class='name'>").append(item.getKey()).append("</div>") // Nom du membre
                     .append("<div class='commit'> Nombre de commits : ").append(item.getValue()).append("</div>") // Son nombre de commit
                     .append("</li>");
+                    if(acc>=5){
+                        html.append("test <br>");
+                        acc = 0;
+                    }
                 }
                 html.append("</div></ul></div>");
             }
@@ -105,6 +111,27 @@ public class CountCommitsPerAuthorPlugin implements AnalyzerPlugin {
                 }
                 html.append("</table></div>");
             }
+
+            //STATISTIQUES D'EDIT PAR MEMBRES
+            if(plugin=="statistiques edit"){
+                html.append("<div class='statEdit'><h2>Statistiques d'edition par membres</h2> <ul> <div class='statEditMembres'>");
+                int acc = 0;
+                for (var item : commitsPerAuthor.entrySet()) {
+                    acc++;
+                    System.out.println(acc);
+                    html.append("<li><div class='name'>").append(item.getKey()).append("</div>") // Nom du membre
+                    .append("<div class='commit'> + : ").append(item.getValue()).append("</div>") //Nombre de lignes ajoutées
+                    .append("<div class='commit'> - : ").append(item.getValue()).append("</div>") // Nombre de lignes supprimées
+                    .append("</li><br>");
+                    
+                }
+                html.append("</div></ul></div>");
+            }
+            
+            //INFORMATION ISSUES PLUGIN
+            
+
+
             
             return html.toString();
         }
