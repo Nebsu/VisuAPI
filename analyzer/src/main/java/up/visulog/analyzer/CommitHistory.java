@@ -7,6 +7,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import java.text.Normalizer;
+import java.awt.Desktop;
 
 public class CommitHistory extends getAPI {
 
@@ -22,7 +23,8 @@ public class CommitHistory extends getAPI {
     // Fonction auxiliaire qui va normaliser une chaine de caractères, c'est-à-dire
     // qu'elle va enlever ses accents :
     private static String normalize(String source) {
-		return Normalizer.normalize(source, Normalizer.Form.NFD).replaceAll("[\u0300-\u036F]", "");
+        source.replace("A©", "é");
+		return source;
 	}
 
     // Fonction auxiliaire qui affiche l'historique des commits d'un projet (du plus récent au plus ancien) :
@@ -84,11 +86,47 @@ public class CommitHistory extends getAPI {
         return commits; 
     }
 
+    public String toHTML(){
+        StringBuilder html = new StringBuilder();
+        html.append("<html><link rel='stylesheet' type='text/css' href='test.css'><body><h1>Historique des commits</h1>");
+        int n = 1;
+        for(Commit commit : commitsList){
+            html.append("<ul>").append(n++ + ". ").append(commit).append("</ul>");
+        }
+
+        html.append("</body></html>");
+        return html.toString();
+    }
+
+    ////////////////////////////////////////////CREER PAGE////////////////////////////////////////////////
+    public void creer(String s) throws IOException {
+        File f = new File("historique.html");
+        FileOutputStream fos = new FileOutputStream("historique.html");
+        fos.write(s.getBytes());
+        fos.flush();
+        fos.close();
+    }
+
+    public void ouvrirPage() throws IOException {
+        File f = new File("historique.html");
+        if(!Desktop.isDesktopSupported()){
+            System.out.println("Desktop n'est pas prise en charge");
+            return;
+        }
+        Desktop d = Desktop.getDesktop();
+        d.open(f);
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////
+
     // Tests :
     public static void main(String[] args) throws IOException {
         CommitHistory cm1 = new CommitHistory("3389", "bVqyB1SzLYKnSi6u1cdM", 
         "https://gaufre.informatique.univ-paris-diderot.fr");
-        displayCommits(cm1.commitsList);
+        cm1.commitsList = cm1.commitHistory();
+        String html = cm1.toHTML();
+        cm1.creer(html);
+        cm1.ouvrirPage();
         // CommitsParUtilisateur p2 = new CommitsParUtilisateur("3390", null, 
         // "https://gaufre.informatique.univ-paris-diderot.fr");
         // CommitsParUtilisateur p3 = new CommitsParUtilisateur("2335175", null, null);
