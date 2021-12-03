@@ -105,17 +105,18 @@ public class NombresLigneUtilisateur extends getAPI {
             //System.out.println(string + "     additions : " + tab[0] + "    deletions : " + tab[1]);
             html.append("<div class='editMembres'><li><div class='infoMembres'><img src="+ mailToImg((map.get(string+"mail")).toString()) +">")
             .append("<div class='name'>")
-            .append(string).append("</div></div>") // Nom du membre
-            .append("<div class='commit'> + : ").append(tab[0]).append("</div>") //Nombre de lignes ajoutées
-            .append("<div class='commit'> - : ").append(tab[1]).append("</div>") // Nombre de lignes supprimées
-            .append("<div class='commit'> = : ").append(tab[0]-tab[1]).append("</div>") // Nombre de lignes ajoutées - supprimées
-            .append("</li><br></div>");
+            .append(string).append("</div></div><div class='allCommits'>") // Nom du membre
+            .append("<div class='commit'><div class='plus'> + </div> ").append(tab[0]).append("</div>") //Nombre de lignes ajoutées
+            .append("<div class='commit'><div class='moins'> - </div> ").append(tab[1]).append("</div>") // Nombre de lignes supprimées
+            .append("<div class='commit'><div class='egal'> = </div> ").append(tab[0]-tab[1]).append("</div>") // Nombre de lignes ajoutées - supprimées
+            .append("</div></li><br></div>");
         }
         html.append("</div>");
         int[] total = (int[]) map.get("total");
         int res = total[0] - total[1];
-        html.append("<p>"+res+"<p>");
-        html.append("</div>");
+        html.append("<div class='branches'><h3>Nombre de lignes editées au total</h3><div class='nbDeBranches'>"+res+"</div></div>")
+        .append("</div>");
+
         System.out.println("Nombres de lignes du projet : " + res);
         return html.toString();
     }
@@ -123,7 +124,7 @@ public class NombresLigneUtilisateur extends getAPI {
 
     public static void main(String[] args) throws IOException, ParseException {
         NombresLigneUtilisateur n2 = new NombresLigneUtilisateur("3389", "bVqyB1SzLYKnSi6u1cdM", 
-        "https://gaufre.informatique.univ-paris-diderot.fr",true);
+        "https://gaufre.informatique.univ-paris-diderot.fr",false);
         //NombresLigneUtilisateur n2 = new NombresLigneUtilisateur("278964","glpat-v5gGaWWxz_uXdK4MkY8K",null);
         
         CreatePage c = new CreatePage();

@@ -178,13 +178,33 @@ div.infoMembres{
 
 div.name{
     margin-left: 0.5cm;
-    margin-top: 18%;
+    margin-top: 0.7cm;
 }
 
 div.commit{
     margin-top: 5%;
+    display: flex;
 }
 
+div.allCommits{
+    margin-top: 0.25cm;
+    width: 50%;
+    display: flex;
+    justify-content: space-between;
+}
+
+div.plus{
+    color: #28A500;
+    font-style: bold;
+}
+
+div.moins{
+    color: #DE7171;
+}
+
+div.egal{
+    color: #A6A6A6;
+}
 
 
 

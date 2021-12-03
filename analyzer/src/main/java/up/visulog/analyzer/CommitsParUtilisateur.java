@@ -181,14 +181,15 @@ public class CommitsParUtilisateur extends getAPI {
     }
 
     public String createHTMLChart() {
-        StringBuilder html = new StringBuilder("<html><link rel=\"stylesheet\" href=\"pie.css\"><body><h1>Commit Proportion Pie Chart</h1><div id=\"my-pie-chart-container\"><div id=\"my-pie-chart\"></div><div id=\"legenda\">");
+        StringBuilder html = new StringBuilder("<html><link rel=\"stylesheet\" href=\"pie.css\"><body><div class='title'><h1> Statistiques du projet : X </h1> <br> via Gitlab <div class='img'><img src='https://about.gitlab.com/images/press/logo/png/gitlab-icon-rgb.png' width='50' height='50'></div></div>")
+        .append("<h2>Commit Proportion Pie Chart</h2><div id=\"my-pie-chart-container\"><div id=\"my-pie-chart\"></div><div id=\"legenda\">");
         int i = 0;
         //CHOIX DU PLUGIN
 
         String plugin = "statistiques edit";
 
         // ACCUEIL AVEC TITRE
-        html.append("<div class='title'><h1> Statistiques du projet : X </h1> <br> via Gitlab <div class='img'><img src='https://about.gitlab.com/images/press/logo/png/gitlab-icon-rgb.png' width='50' height='50'></div></div>");
+        //html.append("<div class='title'><h1> Statistiques du projet : X </h1> <br> via Gitlab <div class='img'><img src='https://about.gitlab.com/images/press/logo/png/gitlab-icon-rgb.png' width='50' height='50'></div></div>");
         
         //BAR DE CHARGEMENT
         int pourcentage;
@@ -246,7 +247,7 @@ public class CommitsParUtilisateur extends getAPI {
         CommitsParUtilisateur p = new CommitsParUtilisateur("3389", "bVqyB1SzLYKnSi6u1cdM", 
         "https://gaufre.informatique.univ-paris-diderot.fr");
         p.afficherGraphique();
-        CommitsParUtilisateur p2 = new CommitsParUtilisateur("3390", null, 
+        CommitsParUtilisateur p2 = new CommitsParUtilisateur("3389", null, 
         "https://gaufre.informatique.univ-paris-diderot.fr");
         p2.afficherGraphique();
         // CommitsParUtilisateur p3 = new CommitsParUtilisateur("2335175", null, null);
