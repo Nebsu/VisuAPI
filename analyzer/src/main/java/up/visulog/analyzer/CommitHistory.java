@@ -6,8 +6,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import java.text.Normalizer;
-import java.awt.Desktop;
 
 public class CommitHistory extends getAPI {
 
@@ -88,36 +86,23 @@ public class CommitHistory extends getAPI {
 
     public String toHTML(){
         StringBuilder html = new StringBuilder();
-        html.append("<html><link rel='stylesheet' type='text/css' href='test.css'><body><h1>Historique des commits</h1>");
-        int n = 1;
-        for(Commit commit : commitsList){
-            html.append("<ul>").append(n++ + ". ").append(commit).append("</ul>");
-        }
+        html.append("<html><link rel='stylesheet' type='text/css' href='test.css'><body>")
+        .append("<div class='title'><h1>X</h1> <br> via Gitlab <div class='img'><img src='https://about.gitlab.com/images/press/logo/png/gitlab-icon-rgb.png' width='50' height='50'></div></div>");
+        
+        html.append("<div class='histoCommits'> <h2>Historique de commits</h2> <table>")
+                .append("<tr> <td>Date</td> <td>Membre</td> <td>Message</td> <tr>");
+
+                for (Commit commit : commitsList) {
+                    html.append("<tr> <td>").append(commit.date).append("</td>") // Auteur du commit
+                    .append("<td>").append(commit.author).append("</td>") // Contenu du commit
+                    .append("<td>").append(commit.title).append("</td>") 
+                    .append("</tr>");
+                }
+                html.append("</table></div>");
 
         html.append("</body></html>");
         return html.toString();
     }
-
-    ////////////////////////////////////////////CREER PAGE////////////////////////////////////////////////
-    public void creer(String s) throws IOException {
-        File f = new File("historique.html");
-        FileOutputStream fos = new FileOutputStream("historique.html");
-        fos.write(s.getBytes());
-        fos.flush();
-        fos.close();
-    }
-
-    public void ouvrirPage() throws IOException {
-        File f = new File("historique.html");
-        if(!Desktop.isDesktopSupported()){
-            System.out.println("Desktop n'est pas prise en charge");
-            return;
-        }
-        Desktop d = Desktop.getDesktop();
-        d.open(f);
-    }
-
-    //////////////////////////////////////////////////////////////////////////////////////////////////////
 
     // Tests :
     public static void main(String[] args) throws IOException {
@@ -125,8 +110,9 @@ public class CommitHistory extends getAPI {
         "https://gaufre.informatique.univ-paris-diderot.fr");
         cm1.commitsList = cm1.commitHistory();
         String html = cm1.toHTML();
-        cm1.creer(html);
-        cm1.ouvrirPage();
+        CreatePage c = new CreatePage();
+        c.creer(html);
+        c.ouvrirPage();
         // CommitsParUtilisateur p2 = new CommitsParUtilisateur("3390", null, 
         // "https://gaufre.informatique.univ-paris-diderot.fr");
         // CommitsParUtilisateur p3 = new CommitsParUtilisateur("2335175", null, null);

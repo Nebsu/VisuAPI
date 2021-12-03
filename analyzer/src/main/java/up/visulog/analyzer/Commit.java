@@ -14,7 +14,7 @@ public class Commit {
 
     @Override
     public String toString() {
-        return (this.title+"\n"+"Commited by "+this.author+" on "+this.date+"\n");
+        return (this.date + " | " + this.author + "\n: " + this.title);
     }
 
 }
