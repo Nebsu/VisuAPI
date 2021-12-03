@@ -1,6 +1,7 @@
 package up.visulog.analyzer;
 
 import java.util.*;
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -94,8 +95,7 @@ public class NombreModificationFichierPlugin extends getAPI {
                     }
                 }
                 return "false";
-            } 
-            else {
+            } else {
                 JSONObject jsonO = (JSONObject) jsonP.parse(new FileReader("request.json"));
                 if (s.equals("parent")) {
                     JSONArray array = (JSONArray) jsonO.get("parent_ids");
@@ -151,27 +151,27 @@ public class NombreModificationFichierPlugin extends getAPI {
                         }
                     }
                 }
-            }
-            else {
+            } else {
                 System.out.println(m.get(key).toString());
             }
         }
 
     }
-    public static String corrigeHTML(String S){
-        String res ="";
-        for(int i=0; i<S.length(); i++){
-            if(S.charAt(i) == '/' ){
-                res+="%2F";
-            }
-            else {
-            res+= S.charAt(i);
+
+    public static String corrigeHTML(String S) {
+        String res = "";
+        for (int i = 0; i < S.length(); i++) {
+            if (S.charAt(i) == '/') {
+                res += "%2F";
+            } else {
+                res += S.charAt(i);
             }
         }
         return res;
     }
+
     public void CreateHtmlPage() throws IOException {
-        Map<String, Object> CommitsMap= NombreModif();
+        Map<String, Object> CommitsMap = NombreModif();
         int NombredeCommits = (int) CommitsMap.get("Nombre");
         String html = "<!DOCTYPE html>\n" +
                 "<html>\n" +
@@ -222,5 +222,72 @@ public class NombreModificationFichierPlugin extends getAPI {
             e.printStackTrace();
         }
     }
+
+    public static String CreateHtmlPageheader(int NombredeCommits) {
+        String html = "<!DOCTYPE html>\n" +
+                "<html>\n" +
+                "   <head>\n" +
+                "      <style>\n" +
+                "td {\n" +
+                "  text-align: center;\n" +
+                "}\n" +
+                "table {\nwidth:50% ;\n" +
+                "}\n" +
+                "  th, td {\n" +
+                "            border: 1px solid black;\n" +
+                "            height: 25px;\n" +
+                "         }\n" +
+                "      </style>\n" +
+                "   </head>\n" +
+                "\n" +
+                "   <body>\n" +
+                "   \n" +
+                "      <h1>Number of Commits " + NombredeCommits + "</h1>\n" +
+                "      <h2>" + "</h2>\n" +
+                "\n" +
+                "      <table style=\"width:100%;text-align:center;border-collapse:collapse;background-color:gold;\">\n" +
+                "         <tr style=\"background-color:#00FF00\">\n" +
+                "            <th colspan=\"2\">Table of Commits</th>\n" +
+                "         </tr>\n" +
+                "         <tr style=\"background-color:#00FF00\" >\n" +
+                "            <td>Commit's ID </td>\n" +
+                "            <td rowspan=\"1\">Commit's Parent ID</td>\n" +
+                "         </tr>\n";
+
+        return html;
+    }
+
+    public static void CreateHtmlPageNewversion(Map<String, Object> CommitsMap) {// nouvelle version pour creation page html mais avec plusieurs tableaux des ids pour les  commits
+// en cours de changer le syntaxe de la fonction
+        int NombredeCommits = (int) CommitsMap.get("Nombre");
+        String html = CreateHtmlPageheader(NombredeCommits);
+
+
+        for (Map.Entry<String, Object> entry : CommitsMap.entrySet()) {
+            String key = entry.getKey();
+            ArrayList<String[]> IdCouples = entry.getValue();
+
+
+            ArrayList<String[]> IdCouples = (ArrayList<String[]>) CommitsMap.get("Commits");
+
+            for (int i = 0; i < IdCouples.size(); i++) {
+                String[] temp = IdCouples.get(i);
+                html = html + "<tr style=\"background-color:yellowgreen;color:white;\"><td>" + temp[0] + "</td>";
+                html = html + "<td>" + temp[1] + "</td></tr>";
+            }
+        }
+        html = html + "    </table>\n" +
+                "   </body>\n" +
+                "</html>";
+        File f = new File("./commits.html");
+        try {
+            BufferedWriter bw = new BufferedWriter(new FileWriter(f));
+            bw.write(html);
+            bw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
 }
