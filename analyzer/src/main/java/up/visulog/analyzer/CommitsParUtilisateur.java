@@ -126,9 +126,6 @@ public class CommitsParUtilisateur extends getAPI {
     public void creerCss(String s) throws IOException {
         File f = new File("pie.css");
         FileOutputStream fos = new FileOutputStream("pie.css");
-        if(f.exists()) {
-            f.delete();
-        }
         fos.write(s.getBytes());
         fos.flush();
         fos.close();
@@ -137,9 +134,6 @@ public class CommitsParUtilisateur extends getAPI {
     public void creer(String s) throws IOException {
         File f = new File("example.html");
         FileOutputStream fos = new FileOutputStream("example.html");
-        if(f.exists()) {
-            f.delete();
-        }
         fos.write(s.getBytes());
         fos.flush();
         fos.close();
@@ -189,6 +183,23 @@ public class CommitsParUtilisateur extends getAPI {
     public String createHTMLChart() {
         StringBuilder html = new StringBuilder("<html><link rel=\"stylesheet\" href=\"pie.css\"><body><h1>Commit Proportion Pie Chart</h1><div id=\"my-pie-chart-container\"><div id=\"my-pie-chart\"></div><div id=\"legenda\">");
         int i = 0;
+        //CHOIX DU PLUGIN
+
+        String plugin = "statistiques edit";
+
+        // ACCUEIL AVEC TITRE
+        html.append("<div class='title'><h1> Statistiques du projet : X </h1> <br> via Gitlab <div class='img'><img src='https://about.gitlab.com/images/press/logo/png/gitlab-icon-rgb.png' width='50' height='50'></div></div>");
+        
+        //BAR DE CHARGEMENT
+        int pourcentage;
+        pourcentage = (int)(Math.random()*100);
+        
+        html.append("<div class='bar'><div class='percentage has-tip'  style='width: "+pourcentage+"%' data-perc='"+pourcentage+"%'></div></div>");
+
+        //if(pourcentage <100){
+            //html.append("<meta http-equiv='refresh' content='3'>");
+        //}
+        
         for (var item : result.entrySet()) {
             i = i+1;
             String divId = "color-" + i;
