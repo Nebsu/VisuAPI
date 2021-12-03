@@ -262,13 +262,11 @@ public class NombreModificationFichierPlugin extends getAPI {
         int NombredeCommits = (int) CommitsMap.get("Nombre");
         String html = CreateHtmlPageheader(NombredeCommits);
 
-
+        ArrayList<String[]> IdCouples;
         for (Map.Entry<String, Object> entry : CommitsMap.entrySet()) {
             String key = entry.getKey();
-            ArrayList<String[]> IdCouples = entry.getValue();
+            IdCouples = (ArrayList<String[]>) entry.getValue();
 
-
-            ArrayList<String[]> IdCouples = (ArrayList<String[]>) CommitsMap.get("Commits");
 
             for (int i = 0; i < IdCouples.size(); i++) {
                 String[] temp = IdCouples.get(i);
