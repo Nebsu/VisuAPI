@@ -50,6 +50,7 @@ public class NombresLigneUtilisateur extends getAPI {
                 JSONObject objectTemp1 = (JSONObject) commit;
                 JSONObject objectTemp2 = (JSONObject) objectTemp1.get("stats");
                 JSONArray objectTemp3 = (JSONArray) objectTemp1.get("parent_ids");
+                String mail = (String) objectTemp1.get("author_email");
                 int tailleParent = (int) objectTemp3.size();
                 if(tailleParent == 1) {
                     Object temp2 = objectTemp2.get("additions");
@@ -62,7 +63,8 @@ public class NombresLigneUtilisateur extends getAPI {
                         ajouter[1] = temporaire[1] + ((Long) temp3).intValue();
                     }
                     else {
-                        users.add(t);                    
+                        users.add(t);
+                        res.put(t + "mail", mail);                  
                         ajouter[0] = ((Long) temp2).intValue();
                         ajouter[1] = ((Long) temp3).intValue();
                     }
@@ -72,18 +74,18 @@ public class NombresLigneUtilisateur extends getAPI {
                 }
             }
             page++;
-            System.out.println(size);
         } while(size%750 == 0);
         res.put("users",users);
         res.put("total",total);
         return res;
     }
 
-    public static void affiche(Map<String, Object> map) {
+    public void affiche(Map<String, Object> map) throws IOException, ParseException {
         Set<String> user = (Set<String>) map.get("users");
         for (String string : user) {
             int[] tab =(int[]) map.get(string);
             System.out.println(string + "     additions : " + tab[0] + "    deletions : " + tab[1]);
+            System.out.println(this.mailToImg(map.get(string + "mail").toString()));
         }
         int[] total = (int[]) map.get("total");
         int res = total[0] - total[1];
@@ -91,9 +93,9 @@ public class NombresLigneUtilisateur extends getAPI {
     }
 
     public static void main(String[] args) throws IOException, ParseException {
-        NombresLigneUtilisateur n2 = new NombresLigneUtilisateur("3389","8ax_oKvn8CMzvyPmxUD1","https://gaufre.informatique.univ-paris-diderot.fr",true);
+        NombresLigneUtilisateur n2 = new NombresLigneUtilisateur("31683489",null,null,true);
         //NombresLigneUtilisateur n2 = new NombresLigneUtilisateur("278964","glpat-v5gGaWWxz_uXdK4MkY8K",null);
-        affiche(n2.getNombresLigneUtilisateur());
+        n2.affiche(n2.getNombresLigneUtilisateur());
     }
     
 }
