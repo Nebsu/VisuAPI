@@ -5,7 +5,7 @@ import java.net.URL;
 import java.util.Scanner;
 
 public abstract class getAPI {
-    private String Token;
+    public String Token;
     protected String Project;
     public String Adresse;
 
@@ -20,7 +20,7 @@ public abstract class getAPI {
             Adresse = "https://gitlab.com";
         }
         else {
-            Adresse = adresse;
+            Adresse ="https://"+adresse;
             if(!testAdresse()) {
                 setAdresse(scan());
             }
