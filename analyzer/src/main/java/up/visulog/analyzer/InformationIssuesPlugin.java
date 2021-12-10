@@ -68,14 +68,17 @@ public class InformationIssuesPlugin extends getAPI {
     }
     //Cette fonction permet d'obtenir le nombre de tickets.
     public int nbrIssues() throws IOException, ParseException {
-        request("projects/" + String.valueOf(this.Project) + "/issues_statistics", null);
-        JSONParser jsonP = new JSONParser();
-        JSONObject object = (JSONObject) jsonP.parse(new FileReader("request.json"));
-        JSONObject satistics = (JSONObject) object.get("statistics");
-        JSONObject counts = (JSONObject) satistics.get("counts");
-        Long a = (Long) counts.get("all");
-
-        return Math.toIntExact(a);
+        try {
+            request("projects/" + String.valueOf(this.Project) + "/issues_statistics", null);
+            JSONParser jsonP = new JSONParser();
+            JSONObject object = (JSONObject) jsonP.parse(new FileReader("request.json"));
+            JSONObject satistics = (JSONObject) object.get("statistics");
+            JSONObject counts = (JSONObject) satistics.get("counts");
+            Long a = (Long) counts.get("all");
+            return Math.toIntExact(a);
+        } catch (Exception e) {
+            return -1;
+        }
     }
     //Cette fonction permet d'initialiser la HashMap data.
     public void initElement() throws IOException, ParseException {
@@ -97,7 +100,7 @@ public class InformationIssuesPlugin extends getAPI {
     }
 
     public static void main(String[] args) throws IOException, ParseException {
-        InformationIssuesPlugin p = new InformationIssuesPlugin("19835096", "", "https://gitlab.com");
+        InformationIssuesPlugin p = new InformationIssuesPlugin("3389", "8ax_oKvn8CMzvyPmxUD1", "https://gaufre.informatique.univ-paris-diderot.fr");
         p.requestIssue();
         HashMap<String, LinkedList<String>> data = p.getData();
 
