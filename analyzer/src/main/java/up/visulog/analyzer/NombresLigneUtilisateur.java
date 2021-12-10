@@ -98,8 +98,20 @@ public class NombresLigneUtilisateur extends getAPI {
          // ACCUEIL AVEC TITRE
          html.append("<div class='title'><h1> Statistiques du projet : X </h1> <br> via Gitlab <div class='img'><img src='https://about.gitlab.com/images/press/logo/png/gitlab-icon-rgb.png' width='50' height='50'></div></div>");
         
+         // NOMBRE DE LIGNES EDITEES AU TOTAL
+        int[] total = (int[]) map.get("total");
+        int res = total[0] - total[1];
+        html.append("<div class='statEdit'><h2>Statistiques d'edition globales</h2><ul> <div class='statEditMembres'>");
+        html.append("<div class='editMembres'><li><div class='infoMembres'><img src='https://secure.gravatar.com/avatar/3add01f9be15323a4875cb4cde08bbb3?s'>")
+            .append("<div class='name'>")
+            .append("<strong>Projet</strong>").append("</div></div><div class='allCommits'>") // Nom du membre
+            .append("<div class='commit'><div class='plus'> + </div><strong> ").append(total[0]).append("</strong></div>") //Nombre de lignes ajoutées
+            .append("<div class='commit'><div class='moins'> - </div><strong> ").append(total[1]).append("</strong></div>") // Nombre de lignes supprimées
+            .append("<div class='commit'><div class='egal'> = </div><strong> ").append(total[0]-total[1]).append("</strong></div>") // Nombre de lignes ajoutées - supprimées
+            .append("</div></li><br></div>");
+        html.append("</div></ul>");
          //PLUGIN
-        html.append("<div class='statEdit'><h2>Statistiques d'edition par membres</h2> <ul> <div class='statEditMembres'>");
+        html.append("<h2>Statistiques d'edition par membres</h2> <ul> <div class='statEditMembres'>");
         for (String string : user) {
             int[] tab =(int[]) map.get(string);
             //System.out.println(string + "     additions : " + tab[0] + "    deletions : " + tab[1]);
@@ -111,20 +123,14 @@ public class NombresLigneUtilisateur extends getAPI {
             .append("<div class='commit'><div class='egal'> = </div> ").append(tab[0]-tab[1]).append("</div>") // Nombre de lignes ajoutées - supprimées
             .append("</div></li><br></div>");
         }
-        html.append("</div>");
-        int[] total = (int[]) map.get("total");
-        int res = total[0] - total[1];
-        html.append("<div class='branches'><h3>Nombre de lignes editées au total</h3><div class='nbDeBranches'>"+res+"</div></div>")
-        .append("</div>");
-
-        System.out.println("Nombres de lignes du projet : " + res);
+        html.append("</div></ul>").append("</div>");
         return html.toString();
     }
 
 
     public static void main(String[] args) throws IOException, ParseException {
         NombresLigneUtilisateur n2 = new NombresLigneUtilisateur("3389", "bVqyB1SzLYKnSi6u1cdM", 
-        "https://gaufre.informatique.univ-paris-diderot.fr",false);
+        "https://gaufre.informatique.univ-paris-diderot.fr",true);
         //NombresLigneUtilisateur n2 = new NombresLigneUtilisateur("278964","glpat-v5gGaWWxz_uXdK4MkY8K",null);
         
         CreatePage c = new CreatePage();
