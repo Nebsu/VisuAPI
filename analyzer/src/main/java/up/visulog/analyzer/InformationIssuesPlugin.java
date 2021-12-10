@@ -13,30 +13,45 @@ import java.util.Map;
 
 
 public class InformationIssuesPlugin extends getAPI {
+    // L'attribut est une hashmap ou chaque clé représente un élément de la requête, exemple : Title, Author, description, ... etc.
+    //Et la valeur est une LinkedList de String qui liste toutes les données contenues dans chaque élément.
     private HashMap<String, LinkedList<String>> data = new HashMap<String, LinkedList<String>>();
+
     public InformationIssuesPlugin(String project, String token, String adresse) {
         super(project, token, adresse);
 
     }
 
-
-
+    // Cette fonction lis le fichier request.json en extrait chaque object mentionné dans le tableau de la fonction initElement.
+    //Et elle l'ajoute dans l'attribut data.
     public void readAndTabJsonfile(String valeurArecuperer) throws IOException, ParseException {
+        try {
 
-        JSONParser jsParser = new JSONParser();
-        JSONArray issueArray = (JSONArray) jsParser.parse(new FileReader("request.json"));
-        for (Object issue : issueArray) {
-            JSONObject temp = (JSONObject) issue;
-            data.get(valeurArecuperer).add(temp.get(valeurArecuperer).toString());
+            JSONParser jsParser = new JSONParser();
+            JSONArray issueArray = (JSONArray) jsParser.parse(new FileReader("request.json"));
+            for (Object issue : issueArray) {
+                JSONObject temp = (JSONObject) issue;
+                // System.out.println(valeurArecuperer);
+                if (valeurArecuperer.equals("author")) {
+                    JSONObject author = (JSONObject) temp.get("author");
+                    String name = (String) author.get("name");
+                    data.get("author").add(name);
+                } else {
+                    if (temp.get(valeurArecuperer)!=null)
+                    data.get(valeurArecuperer).add(temp.get(valeurArecuperer).toString());
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
-
+    //Cette fonction lance une requête et fait appelle à la fonction addList() entre chaque page.
     public void requestIssue() throws IOException, ParseException {
         int page = 1;
         int size = 0;
         int nbrIssues = nbrIssues();
         initElement();
-        while (size%100 == 0) {
+        while (size % 100 == 0) {
             try {
                 request("projects/" + String.valueOf(this.Project) + "/issues", "per_page=100&page=" + (page));
                 addList();
@@ -44,12 +59,14 @@ public class InformationIssuesPlugin extends getAPI {
                 JSONArray issues = (JSONArray) jsonP.parse(new FileReader("request.json"));
                 size += issues.size();
             } catch (Exception e) {
+
                 System.out.println("Erreur dans la récupération de la donnée suivante:");
             }
             page++;
         }
+        System.out.println(size);
     }
-
+    //Cette fonction permet d'obtenir le nombre de tickets.
     public int nbrIssues() throws IOException, ParseException {
         request("projects/" + String.valueOf(this.Project) + "/issues_statistics", null);
         JSONParser jsonP = new JSONParser();
@@ -60,26 +77,29 @@ public class InformationIssuesPlugin extends getAPI {
 
         return Math.toIntExact(a);
     }
-
+    //Cette fonction permet d'initialiser la HashMap data.
     public void initElement() throws IOException, ParseException {
         String[] element = {"iid", "title", "state", "created_at", "updated_at", "assignees", "author","description"};
         for (int i = 0; i < element.length; i++) {
             data.put(element[i], new LinkedList<String>());
         }
     }
-        public void addList() throws IOException, ParseException {
-            String[] element = {"iid", "title", "state", "created_at", "updated_at", "assignees", "author"};
-            for (int i = 0; i < element.length; i++) {
-                readAndTabJsonfile(element[i]);
-            }
+    //Cette fonction fait appelle à readAndTabJsonfile pour chaque élément désiré.
+    public void addList() throws IOException, ParseException {
+        String[] element = {"iid", "title", "state", "created_at", "updated_at", "assignees", "author","description"};
+        for (int i = 0; i < element.length; i++) {
+            readAndTabJsonfile(element[i]);
         }
+    }
+
+    public HashMap<String, LinkedList<String>> getData() {
+        return data;
+    }
 
     public static void main(String[] args) throws IOException, ParseException {
-        InformationIssuesPlugin p = new InformationIssuesPlugin("10582521", "", "https://gitlab.com");
+        InformationIssuesPlugin p = new InformationIssuesPlugin("19835096", "", "https://gitlab.com");
         p.requestIssue();
-        for (int i = 0; i < p.data.get("iid").size(); i++) {
-           System.out.println(p.data.get("iid").get(i));
-       }
+        HashMap<String, LinkedList<String>> data = p.getData();
 
     }
 }
