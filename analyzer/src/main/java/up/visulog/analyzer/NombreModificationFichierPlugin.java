@@ -257,26 +257,78 @@ public class NombreModificationFichierPlugin extends getAPI {
         return html;
     }
 
-    public static void CreateHtmlPageNewversion(Map<String, Object> CommitsMap) {// nouvelle version pour creation page html mais avec plusieurs tableaux des ids pour les  commits
-// en cours de changer le syntaxe de la fonction
+    public static void CreateHtmlPage(Map<String, Object> CommitsMap) {    // convert hashmap to an HTML page
         int NombredeCommits = (int) CommitsMap.get("Nombre");
-        String html = CreateHtmlPageheader(NombredeCommits);
+        String html = " <!DOCTYPE html>\n" +
+                "<html lang=\"en\">\n" +
+                "<head>\n" +
+                "<title>Table V03</title>\n" +
+                "<meta charset=\"UTF-8\">\n" +
+                "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n" +
+                "<link rel=\"icon\" type=\"image/png\" href=\"images/icons/favicon.ico\" />\n" +
+                "<link rel=\"stylesheet\" type=\"text/css\" href=\"bootstrap.min.css\">\n" +
+                "<link rel=\"stylesheet\" type=\"text/css\" href=\"font-awesome.min.css\">\n" +
+                "<link rel=\"stylesheet\" type=\"text/css\" href=\"animate.css\">\n" +
+                "<link rel=\"stylesheet\" type=\"text/css\" href=\"select2.min.css\">\n" +
+                "<link rel=\"stylesheet\" type=\"text/css\" href=\"perfect-scrollbar.css\">\n" +
+                "<link rel=\"stylesheet\" type=\"text/css\" href=\"util.css\">\n" +
+                "<link rel=\"stylesheet\" type=\"text/css\" href=\"main.css\">\n" +
+                "</head>\n" +
+                "<body>\n" +
+                "<h1 class=\"limiter2\" >Number of Commits : " + NombredeCommits + "</h1>\n" +
 
-        ArrayList<String[]> IdCouples;
-        for (Map.Entry<String, Object> entry : CommitsMap.entrySet()) {
-            String key = entry.getKey();
-            IdCouples = (ArrayList<String[]>) entry.getValue();
+                "<div class=\"limiter\">\n" +
+                "<div class=\"container-table100\">\n" +
+                "<div class=\"wrap-table100\">\n" +
+                "<div class=\"table100 ver5 m-b-110\">";
+        String tablebegining="<table data-vertable=\"ver5\">\n" +
+                "<thead>\n" +
+                "<tr class=\"row100 head \">\n"+
+                "<th class=\"column100 column1\" data-column=\"column1\">Commit Index</th>";
+        tablebegining=tablebegining+  "<th class=\"column100 column2\" data-column=\"column2\"> Commit's ID	</th>";
+        tablebegining=tablebegining+  "<th class=\"column100 column3\" data-column=\"column3\"> Commit's Parent ID </th>";
+        tablebegining=tablebegining+"</tr>\n"+
+                "</thead>\n"+
+                "<tbody>\n";
+        ArrayList<String[]> IdCouples = null;
+        html=html+tablebegining;
+        int index=0;
 
-
-            for (int i = 0; i < IdCouples.size(); i++) {
-                String[] temp = IdCouples.get(i);
-                html = html + "<tr style=\"background-color:yellowgreen;color:white;\"><td>" + temp[0] + "</td>";
-                html = html + "<td>" + temp[1] + "</td></tr>";
+        for (int i=0; i<CommitsMap.size()-1; i++) {
+            IdCouples = (ArrayList<String[]>) CommitsMap.get("Commit"+i);
+            for (int j=0; j<IdCouples.size(); j++ ) {
+                String[] temp = IdCouples.get(j);
+                index=index+1 ;
+                if (index<10) {
+                    html = html +"<tr class=\"row100\">\n"+
+                            "<td class=\"column100 column1\" data-column=\"column1\">"+ "0"+index +"</td>\n"+
+                            "<td class=\"column100 column2\" data-column=\"column2\">"+ temp[0] +"</td>\n"+
+                            "<td class=\"column100 column3\" data-column=\"column3\">"+temp[1] +"</td>\n"+
+                            "</tr>";
+                }else {
+                    html = html +"<tr class=\"row100\">\n"+
+                            "<td class=\"column100 column1\" data-column=\"column1\">"+ index +"</td>\n"+
+                            "<td class=\"column100 column2\" data-column=\"column2\">"+ temp[0] +"</td>\n"+
+                            "<td class=\"column100 column3\" data-column=\"column3\">"+temp[1] +"</td>\n"+
+                            "</tr>";
+                }
             }
         }
-        html = html + "    </table>\n" +
-                "   </body>\n" +
-                "</html>";
+        html=html+"</tbody>\n"+
+                "</table>\n"+
+                "</div>\n"+
+                "</div>\n"+
+                "</div>\n"+
+                "</div>\n"+
+                "<script src=\"jquery-3.2.1.min.js\"></script>\n"+
+                "<script src=\"popper.js\"></script>\n"+
+                "<script src=\"bootstrap.min.js\"></script>\n"+
+                "<script src=\"select2.min.js\"></script>\n"+
+                "<script src=\"main.js\"></script>\n"+
+                "</body>\n"+
+                "</html>\n";
+
+        //  String tableEnding= "</table>\n";
         File f = new File("./commits.html");
         try {
             BufferedWriter bw = new BufferedWriter(new FileWriter(f));
