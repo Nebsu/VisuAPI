@@ -176,4 +176,29 @@ public abstract class getAPI {
         reader.close();
     }
 
+    protected void request2(String uri, String args, String i) throws IOException {
+        String s = "";
+        if(this.Token != null) {
+            uri += "?private_token=" + this.Token;
+            if(args != null) {
+                uri += "&" + args;
+            }
+        }
+        else if(args != null) {
+            uri += "?" + args;
+        }
+        URL url = new URL(this.Adresse + "/api/v4/" + uri + i);
+        InputStream is = url.openConnection().getInputStream();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        String line = null;
+        FileOutputStream output = new FileOutputStream(".gen/request" + i + ".json");
+        while ((line = reader.readLine()) != null) {
+            s = s + line;
+        }
+        output.write(s.getBytes());
+        output.flush();
+        output.close();
+        reader.close();
+    }
+
 }
