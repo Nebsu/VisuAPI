@@ -80,7 +80,11 @@ public class CLILauncher {
                 return;
             }
             String[] spl = s.split("=");
-            arguments.put(spl[0], spl[1]);
+            String s2=null;
+            if(spl.length > 1) {
+                s2 = spl[1];
+            }
+            arguments.put(spl[0],s2);
         }
         if (arguments.get("Plugin") == null) {
             return; // ERREUR
@@ -98,7 +102,7 @@ public class CLILauncher {
                 // TODO Faire en sorte de renvoyer une erreur si y'a trop d'args
 
                 boolean all = false;
-                if (arguments.get("all") != null && arguments.get("all").equals("true")) {
+                if (arguments.get("all") != null && arguments.get("All").equals("true")) {
                     all = true;
                 }
                 NombresLigneUtilisateur NLU = new NombresLigneUtilisateur(id, token, adr, all);
@@ -111,7 +115,7 @@ public class CLILauncher {
                 }
                 String file = arguments.get("File");
                 String branch = arguments.get("Branch");
-                NombreModificationFichierPlugin NLM = new NombreModificationFichierPlugin(id, adr, token, file, branch,
+                NombreModificationFichierPlugin NLM = new NombreModificationFichierPlugin(id, adr, token , file, branch,
                         true);
                 NLM.NombreModif(null, null);
                 c.creer(NLM.toString());
