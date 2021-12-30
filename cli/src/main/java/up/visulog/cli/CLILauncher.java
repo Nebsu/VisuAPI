@@ -10,16 +10,21 @@ import up.visulog.analyzer.getAPI;
 import up.visulog.analyzer.NombresLigneUtilisateur;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.FileSystems;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.awt.Desktop;
 
 import org.json.simple.parser.ParseException;
 
 public class CLILauncher {
+    public static final String ANSI_RESET = "\u001B[0m";
+    public static final String ANSI_RED = "\u001B[31m";
 
-    public static void main(String[] args) throws IOException, ParseException {
+    public static void main(String[] args) throws IOException, ParseException, URISyntaxException {
         // var config = makeConfigFromCommandLineArgs(args);
         // if (config.isPresent()) {
         //     var analyzer = new Analyzer(config.get());
@@ -71,11 +76,15 @@ public class CLILauncher {
         return Optional.of(new Configuration(gitPath, plugins));
     }
 
-    public static void test(String[] args) throws IOException, ParseException {
+    public static void test(String[] args) throws IOException, ParseException, URISyntaxException {
         // TODO : une map avec tout les clef = args
         Map<String, String> arguments = new HashMap<String, String>();
         for (var s : args) {
             if (s.toUpperCase().equals("WIKI")) {
+                if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+                    Desktop.getDesktop().browse(new URI ("https://gaufre.informatique.univ-paris-diderot.fr/groupe-1/visulog/wikis/home"));
+                   // Desktop.getDesktop().browse(new URI("google.com"));
+                }
                 // TODO créer page avec code qui redirect vers wiki
                 return;
             }
@@ -95,6 +104,7 @@ public class CLILauncher {
         String adr = arguments.get("Adresse");
         String token = arguments.get("Token");
         switch (arguments.get("Plugin")) {
+            default: displayHelpAndExit();
             case "LignesUtilisateurs":
                 if (arguments.size() > 5) {
                     displayHelpAndExit();
@@ -144,7 +154,8 @@ public class CLILauncher {
     }
 
     private static void displayHelpAndExit() {
-        System.out.println("Wrong command...");
+        System.out.println(ANSI_RED +"Mauvaise commande, veuillez consulter le wiki pour voir la liste des commandes disponibles et leurs utilisations");
+        System.out.println("Vous pouvez appeler la commande \" .\\gradlew run --args='wiki' \"" + ANSI_RESET + " /!\\ Attention cela requiert une connexion à un compte gaufre");
         // TODO: print the list of options and their syntax
         System.exit(0);
     }
