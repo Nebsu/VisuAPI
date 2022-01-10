@@ -83,7 +83,6 @@ public class CLILauncher {
             if (s.toUpperCase().equals("WIKI")) {
                 if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
                     Desktop.getDesktop().browse(new URI ("https://gaufre.informatique.univ-paris-diderot.fr/groupe-1/visulog/wikis/home"));
-                   // Desktop.getDesktop().browse(new URI("google.com"));
                 }
                 // TODO créer page avec code qui redirect vers wiki
                 return;
@@ -96,7 +95,8 @@ public class CLILauncher {
             arguments.put(spl[0],s2);
         }
         if (arguments.get("Plugin") == null) {
-            return; // ERREUR
+            displayHelpAndExit();
+            return;// ERREUR
         }
         // TODO à modifier ptet
         CreatePage c = new CreatePage();
@@ -125,23 +125,28 @@ public class CLILauncher {
                 }
                 String file = arguments.get("File");
                 String branch = arguments.get("Branch");
-                NombreModificationFichierPlugin NLM = new NombreModificationFichierPlugin(id, adr, token , file, branch,
+                NombreModificationFichierPlugin NMF = new NombreModificationFichierPlugin(id, adr, token , file, branch,
                         true);
-                NLM.NombreModif(null, null);
-                c.creer(NLM.toString());
+                NMF.NombreModif(null, null);
+                c.creer(NMF.toString());
                 c.ouvrirPage();
                 break;
             case "InformationIssues":
                 // c.creer(NLM.toString());
                 // c.ouvrirPage();
                  break;
-            case "NombreCommitsUtilisateur":
-                // c.creer(NLM.toString());
+            case "CommitsUtilisateurs":
+                CommitsParUtilisateur CPU = new CommitsParUtilisateur(id,token,adr);
+                CPU.afficherGraphique();
+                // c.creer(CPU.toString());
                 // c.ouvrirPage();
                  break;
             case "NombreLignesUtilisateur":
                 // c.creer(NLM.toString());
                 // c.ouvrirPage();
+                break;
+            case "HistoriqueCommit" :
+                
                 break;
         }
         // if (c /*TODO test cas ou fichier n'est pas vide */) {
