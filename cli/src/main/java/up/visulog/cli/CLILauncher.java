@@ -117,7 +117,8 @@ public class CLILauncher {
                 }
                 NombresLigneUtilisateur NLU = new NombresLigneUtilisateur(id, token, adr, all);
                 Map<String, Object> res = NLU.getNombresLigneUtilisateur();
-                c.creer("drftgyhu");
+                c.creer(NLU.afficheHTML(res));
+                c.ouvrirPage();
                 break;
             case "ModificationsFichier":
                 if (arguments.size() > 5) {
