@@ -4,8 +4,12 @@ import java.io.*;
 import java.net.URL;
 import java.util.Scanner;
 
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
 public abstract class getAPI {
-    public String Token;
+    protected String Token;
     protected String Project;
     public String Adresse;
 
@@ -146,6 +150,13 @@ public abstract class getAPI {
 
     public String scan() {
         return new Scanner(System.in).nextLine();
+    }
+
+    public String mailToImg(String mail) throws IOException, ParseException {
+        request("avatar","email=" + mail);
+        JSONParser jsonP = new JSONParser();
+        JSONObject image = (JSONObject) jsonP.parse(new FileReader("request.json"));
+        return (String) image.get("avatar_url");
     }
 
     protected void request(String uri, String args) throws IOException {

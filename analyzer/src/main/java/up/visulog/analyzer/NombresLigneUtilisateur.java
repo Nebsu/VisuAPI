@@ -50,6 +50,7 @@ public class NombresLigneUtilisateur extends getAPI {
                 JSONObject objectTemp1 = (JSONObject) commit;
                 JSONObject objectTemp2 = (JSONObject) objectTemp1.get("stats");
                 JSONArray objectTemp3 = (JSONArray) objectTemp1.get("parent_ids");
+                String mail = (String) objectTemp1.get("author_email");
                 int tailleParent = (int) objectTemp3.size();
                 if(tailleParent == 1) {
                     Object temp2 = objectTemp2.get("additions");
@@ -62,7 +63,8 @@ public class NombresLigneUtilisateur extends getAPI {
                         ajouter[1] = temporaire[1] + ((Long) temp3).intValue();
                     }
                     else {
-                        users.add(t);                    
+                        users.add(t);
+                        res.put(t + "mail", mail);                  
                         ajouter[0] = ((Long) temp2).intValue();
                         ajouter[1] = ((Long) temp3).intValue();
                     }
@@ -72,28 +74,69 @@ public class NombresLigneUtilisateur extends getAPI {
                 }
             }
             page++;
-            System.out.println(size);
         } while(size%750 == 0);
         res.put("users",users);
         res.put("total",total);
         return res;
     }
 
-    public static void affiche(Map<String, Object> map) {
+    public void affiche(Map<String, Object> map) throws IOException, ParseException {
         Set<String> user = (Set<String>) map.get("users");
         for (String string : user) {
             int[] tab =(int[]) map.get(string);
             System.out.println(string + "     additions : " + tab[0] + "    deletions : " + tab[1]);
+            System.out.println(this.mailToImg(map.get(string + "mail").toString()));
         }
         int[] total = (int[]) map.get("total");
         int res = total[0] - total[1];
         System.out.println("Nombres de lignes du projet : " + res);
     }
 
+    public String afficheHTML(Map<String, Object> map) throws IOException, ParseException {
+        Set<String> user = (Set<String>) map.get("users");
+        StringBuilder html = new StringBuilder("<html><meta charset='utf-8'/><link rel='stylesheet' type='text/css' href='test.css'><body>");
+         // ACCUEIL AVEC TITRE
+         html.append("<div class='title'><h1> Statistiques du projet : X </h1> <br> via Gitlab <div class='img'><img src='https://about.gitlab.com/images/press/logo/png/gitlab-icon-rgb.png' width='50' height='50'></div></div>");
+        
+         // NOMBRE DE LIGNES EDITEES AU TOTAL
+        int[] total = (int[]) map.get("total");
+        int res = total[0] - total[1];
+        html.append("<div class='statEdit'><h2>Statistiques d'edition globales</h2><ul> <div class='statEditMembres'>");
+        html.append("<div class='editMembres'><li><div class='infoMembres'><img src='https://secure.gravatar.com/avatar/3add01f9be15323a4875cb4cde08bbb3?s'>")
+            .append("<div class='name'>")
+            .append("<strong>Projet</strong>").append("</div></div><div class='allCommits'>") // Nom du membre
+            .append("<div class='commit'><div class='plus'> + </div><strong> ").append(total[0]).append("</strong></div>") //Nombre de lignes ajoutées
+            .append("<div class='commit'><div class='moins'> - </div><strong> ").append(total[1]).append("</strong></div>") // Nombre de lignes supprimées
+            .append("<div class='commit'><div class='egal'> = </div><strong> ").append(total[0]-total[1]).append("</strong></div>") // Nombre de lignes ajoutées - supprimées
+            .append("</div></li><br></div>");
+        html.append("</div></ul>");
+         //PLUGIN
+        html.append("<h2>Statistiques d'edition par membres</h2> <ul> <div class='statEditMembres'>");
+        for (String string : user) {
+            int[] tab =(int[]) map.get(string);
+            //System.out.println(string + "     additions : " + tab[0] + "    deletions : " + tab[1]);
+            html.append("<div class='editMembres'><li><div class='infoMembres'><img src="+ mailToImg((map.get(string+"mail")).toString()) +">")
+            .append("<div class='name'>")
+            .append(string).append("</div></div><div class='allCommits'>") // Nom du membre
+            .append("<div class='commit'><div class='plus'> + </div> ").append(tab[0]).append("</div>") //Nombre de lignes ajoutées
+            .append("<div class='commit'><div class='moins'> - </div> ").append(tab[1]).append("</div>") // Nombre de lignes supprimées
+            .append("<div class='commit'><div class='egal'> = </div> ").append(tab[0]-tab[1]).append("</div>") // Nombre de lignes ajoutées - supprimées
+            .append("</div></li><br></div>");
+        }
+        html.append("</div></ul>").append("</div>");
+        return html.toString();
+    }
+
+
     public static void main(String[] args) throws IOException, ParseException {
-        NombresLigneUtilisateur n2 = new NombresLigneUtilisateur("3389","8ax_oKvn8CMzvyPmxUD1","https://gaufre.informatique.univ-paris-diderot.fr",true);
+        NombresLigneUtilisateur n2 = new NombresLigneUtilisateur("3389", "bVqyB1SzLYKnSi6u1cdM", 
+        "https://gaufre.informatique.univ-paris-diderot.fr",true);
         //NombresLigneUtilisateur n2 = new NombresLigneUtilisateur("278964","glpat-v5gGaWWxz_uXdK4MkY8K",null);
-        affiche(n2.getNombresLigneUtilisateur());
+        
+        CreatePage c = new CreatePage();
+        c.creer(n2.afficheHTML(n2.getNombresLigneUtilisateur()));
+        c.ouvrirPage();
+        
     }
     
 }
