@@ -6,6 +6,11 @@ plugins {
 
 application.mainClass.set("up.visulog.cli.CLILauncher")
 
+
+val run by tasks.getting(JavaExec::class) {
+    standardInput = System.`in`
+}
+
 dependencies {
     implementation(project(":analyzer"))
     implementation(project(":config"))
