@@ -1,6 +1,7 @@
 package up.visulog.analyzer;
 
 import java.util.*;
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -185,6 +186,25 @@ public class NombreModificationFichierPlugin extends getAPI {
         return false;
     }
 
+    public static void affiche(Map<String, Object> m) {
+        Set<String> s = m.keySet();
+        for (String key : s) {
+            System.out.print("Clé : " + key + " Valeur : ");
+            if (m.get(key) instanceof ArrayList) {
+                ArrayList<String[]> ss = (ArrayList<String[]>) m.get(key);
+                for (String[] tab : ss) {
+                    for (int i = 0; i < tab.length; i++) {
+                        if (i == 0) {
+                            System.out.print("Commit ID :" + tab[i] + " ");
+                        } else {
+                            System.out.println("Parent ID :" + tab[i]);
+                        }
+                    }
+                }
+            } else {
+                System.out.println(m.get(key).toString());
+            }
+        }
 
     private boolean testBranche(String Branche) {
         try {
@@ -220,8 +240,174 @@ public class NombreModificationFichierPlugin extends getAPI {
         return res;
     }
 
-    public LinkedList<String> getCommitsParcourus() {
-        return CommitsParcourus;
+    public void CreateHtmlPage() throws IOException {
+        Map<String, Object> CommitsMap = NombreModif();
+        int NombredeCommits = (int) CommitsMap.get("Nombre");
+        String html = "<!DOCTYPE html>\n" +
+                "<html>\n" +
+                "   <head>\n" +
+                "      <style>\n" +
+                "td {\n" +
+                "  text-align: center;\n" +
+                "}\n" +
+                "table {\nwidth:50% ;\n" +
+                "}\n" +
+                "  th, td {\n" +
+                "            border: 1px solid black;\n" +
+                "            height: 25px;\n" +
+                "         }\n" +
+                "      </style>\n" +
+                "   </head>\n" +
+                "\n" +
+                "   <body>\n" +
+                "   \n" +
+                "      <h1>Number of Commits " + NombredeCommits + "</h1>\n" +
+                "      <h2>" + "</h2>\n" +
+                "\n" +
+                "      <table style=\"width:100%;text-align:center;border-collapse:collapse;background-color:gold;\">\n" +
+                "         <tr style=\"background-color:#00FF00\">\n" +
+                "            <th colspan=\"2\">Table of Commits</th>\n" +
+                "         </tr>\n" +
+                "         <tr style=\"background-color:#00FF00\" >\n" +
+                "            <td>Commit's ID </td>\n" +
+                "            <td rowspan=\"1\">Commit's Parent ID</td>\n" +
+                "         </tr>\n";
+
+        ArrayList<String[]> IdCouples = (ArrayList<String[]>) CommitsMap.get("Commits");
+
+        for (int i = 0; i < IdCouples.size(); i++) {
+            String[] temp = IdCouples.get(i);
+            html = html + "<tr style=\"background-color:yellowgreen;color:white;\"><td>" + temp[0] + "</td>";
+            html = html + "<td>" + temp[1] + "</td></tr>";
+        }
+        html = html + "    </table>\n" +
+                "   </body>\n" +
+                "</html>";
+        File f = new File("./commits.html");
+        try {
+            BufferedWriter bw = new BufferedWriter(new FileWriter(f));
+            bw.write(html);
+            bw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
+
+    public static String CreateHtmlPageheader(int NombredeCommits) {
+        String html = "<!DOCTYPE html>\n" +
+                "<html>\n" +
+                "   <head>\n" +
+                "      <style>\n" +
+                "td {\n" +
+                "  text-align: center;\n" +
+                "}\n" +
+                "table {\nwidth:50% ;\n" +
+                "}\n" +
+                "  th, td {\n" +
+                "            border: 1px solid black;\n" +
+                "            height: 25px;\n" +
+                "         }\n" +
+                "      </style>\n" +
+                "   </head>\n" +
+                "\n" +
+                "   <body>\n" +
+                "   \n" +
+                "      <h1>Number of Commits " + NombredeCommits + "</h1>\n" +
+                "      <h2>" + "</h2>\n" +
+                "\n" +
+                "      <table style=\"width:100%;text-align:center;border-collapse:collapse;background-color:gold;\">\n" +
+                "         <tr style=\"background-color:#00FF00\">\n" +
+                "            <th colspan=\"2\">Table of Commits</th>\n" +
+                "         </tr>\n" +
+                "         <tr style=\"background-color:#00FF00\" >\n" +
+                "            <td>Commit's ID </td>\n" +
+                "            <td rowspan=\"1\">Commit's Parent ID</td>\n" +
+                "         </tr>\n";
+
+        return html;
+    }
+
+    public static void CreateHtmlPage(Map<String, Object> CommitsMap) {    // convert hashmap to an HTML page
+        int NombredeCommits = (int) CommitsMap.get("Nombre");
+        String html = " <!DOCTYPE html>\n" +
+                "<html lang=\"en\">\n" +
+                "<head>\n" +
+                "<title>Table V03</title>\n" +
+                "<meta charset=\"UTF-8\">\n" +
+                "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n" +
+                "<link rel=\"icon\" type=\"image/png\" href=\"images/icons/favicon.ico\" />\n" +
+                "<link rel=\"stylesheet\" type=\"text/css\" href=\"bootstrap.min.css\">\n" +
+                "<link rel=\"stylesheet\" type=\"text/css\" href=\"font-awesome.min.css\">\n" +
+                "<link rel=\"stylesheet\" type=\"text/css\" href=\"animate.css\">\n" +
+                "<link rel=\"stylesheet\" type=\"text/css\" href=\"select2.min.css\">\n" +
+                "<link rel=\"stylesheet\" type=\"text/css\" href=\"perfect-scrollbar.css\">\n" +
+                "<link rel=\"stylesheet\" type=\"text/css\" href=\"util.css\">\n" +
+                "<link rel=\"stylesheet\" type=\"text/css\" href=\"main.css\">\n" +
+                "</head>\n" +
+                "<body>\n" +
+                "<h1 class=\"limiter2\" >Number of Commits : " + NombredeCommits + "</h1>\n" +
+
+                "<div class=\"limiter\">\n" +
+                "<div class=\"container-table100\">\n" +
+                "<div class=\"wrap-table100\">\n" +
+                "<div class=\"table100 ver5 m-b-110\">";
+        String tablebegining="<table data-vertable=\"ver5\">\n" +
+                "<thead>\n" +
+                "<tr class=\"row100 head \">\n"+
+                "<th class=\"column100 column1\" data-column=\"column1\">Commit Index</th>";
+        tablebegining=tablebegining+  "<th class=\"column100 column2\" data-column=\"column2\"> Commit's ID	</th>";
+        tablebegining=tablebegining+  "<th class=\"column100 column3\" data-column=\"column3\"> Commit's Parent ID </th>";
+        tablebegining=tablebegining+"</tr>\n"+
+                "</thead>\n"+
+                "<tbody>\n";
+        ArrayList<String[]> IdCouples = null;
+        html=html+tablebegining;
+        int index=0;
+
+        for (int i=0; i<CommitsMap.size()-1; i++) {
+            IdCouples = (ArrayList<String[]>) CommitsMap.get("Commit"+i);
+            for (int j=0; j<IdCouples.size(); j++ ) {
+                String[] temp = IdCouples.get(j);
+                index=index+1 ;
+                if (index<10) {
+                    html = html +"<tr class=\"row100\">\n"+
+                            "<td class=\"column100 column1\" data-column=\"column1\">"+ "0"+index +"</td>\n"+
+                            "<td class=\"column100 column2\" data-column=\"column2\">"+ temp[0] +"</td>\n"+
+                            "<td class=\"column100 column3\" data-column=\"column3\">"+temp[1] +"</td>\n"+
+                            "</tr>";
+                }else {
+                    html = html +"<tr class=\"row100\">\n"+
+                            "<td class=\"column100 column1\" data-column=\"column1\">"+ index +"</td>\n"+
+                            "<td class=\"column100 column2\" data-column=\"column2\">"+ temp[0] +"</td>\n"+
+                            "<td class=\"column100 column3\" data-column=\"column3\">"+temp[1] +"</td>\n"+
+                            "</tr>";
+                }
+            }
+        }
+        html=html+"</tbody>\n"+
+                "</table>\n"+
+                "</div>\n"+
+                "</div>\n"+
+                "</div>\n"+
+                "</div>\n"+
+                "<script src=\"jquery-3.2.1.min.js\"></script>\n"+
+                "<script src=\"popper.js\"></script>\n"+
+                "<script src=\"bootstrap.min.js\"></script>\n"+
+                "<script src=\"select2.min.js\"></script>\n"+
+                "<script src=\"main.js\"></script>\n"+
+                "</body>\n"+
+                "</html>\n";
+
+        //  String tableEnding= "</table>\n";
+        File f = new File("./commits.html");
+        try {
+            BufferedWriter bw = new BufferedWriter(new FileWriter(f));
+            bw.write(html);
+            bw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
 }
