@@ -33,6 +33,7 @@ public class NombreModificationFichierPlugin extends getAPI {
             Chemin = scanner.next();
         }
         this.Chemin = corrigeHTML(Chemin);
+        System.out.println("file ="+Chemin);
     }
 
     
@@ -135,7 +136,7 @@ public class NombreModificationFichierPlugin extends getAPI {
                     JSONObject temp = (JSONObject) diff;
                     String newP = temp.get("new_path").toString();
                     String oldP = temp.get("old_path").toString();
-                    if (newP.equals(this.Chemin)) {
+                    if (corrigeHTML(newP).equals(this.Chemin)) {
                         return oldP;
                     }
                 }
@@ -170,7 +171,7 @@ public class NombreModificationFichierPlugin extends getAPI {
             super.request(request, null);
             String diff = lectureJson("diff"); 
             if (!diff.equals("false")){
-                this.Chemin = diff;
+                this.Chemin = corrigeHTML(diff);
                 return true;
             }
             return false;
