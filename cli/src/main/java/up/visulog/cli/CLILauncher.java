@@ -147,7 +147,10 @@ public class CLILauncher {
                 // c.ouvrirPage();
                 break;
             case "HistoriqueCommit" :
-                
+                CommitHistory CH = new CommitHistory(id, token, adr);
+                String html = CH.toHTML();
+                c.creer(html);
+                c.ouvrirPage();
                 break;
         }
         // if (c /*TODO test cas ou fichier n'est pas vide */) {
@@ -162,7 +165,6 @@ public class CLILauncher {
     private static void displayHelpAndExit() {
         System.out.println(ANSI_RED +"Mauvaise commande, veuillez consulter le wiki pour voir la liste des commandes disponibles et leurs utilisations");
         System.out.println("Vous pouvez appeler la commande \" .\\gradlew run --args='wiki' \"" + ANSI_RESET + " /!\\ Attention cela requiert une connexion à un compte gaufre");
-        // TODO: print the list of options and their syntax
         System.exit(0);
     }
 }

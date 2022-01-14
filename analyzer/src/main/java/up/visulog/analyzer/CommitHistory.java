@@ -106,7 +106,7 @@ public class CommitHistory extends getAPI {
     public String toHTML(){
         StringBuilder html = new StringBuilder();
         html.append("<html><link rel='stylesheet' type='text/css' href='test.css'><body>")
-        .append("<div class='title'><h1>X</h1> <br> via Gitlab <div class='img'><img src='https://about.gitlab.com/images/press/logo/png/gitlab-icon-rgb.png' width='50' height='50'></div></div>");
+        .append("<div class='title'><h1>VisuAPI</h1> <br> via Gitlab <div class='img'><img src='https://about.gitlab.com/images/press/logo/png/gitlab-icon-rgb.png' width='50' height='50'></div></div>");
         
         html.append("<div class='histoCommits'> <h2>Historique de commits</h2> <table>")
                 .append("<tr> <td>Date</td> <td>Membre</td> <td>Message</td> <tr>");
