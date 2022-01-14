@@ -30,7 +30,6 @@ public abstract class getAPI {
             else {
                 Adresse = adresse;
             }
-            System.out.println(Adresse);
             if(!testAdresse()) {
                 System.out.println(Adresse);
                 setAdresse(scan());

@@ -28,7 +28,7 @@ public class CLILauncher {
         commandToFunction(args);
     }
 
-    public static void commandToFunction(String[] args) throws IOException, ParseException, URISyntaxException {
+    public static void commandToFunction(String[] args) throws IOException, ParseException, URISyntaxException { // Fonction qui lit la ligne passée en commande et appelle la fonction correspondante si les critères requis sont remplis.
         Map<String, String> arguments = new HashMap<String, String>();
         for (var s : args) {
             if (s.toUpperCase().equals("WIKI")) {
@@ -54,7 +54,7 @@ public class CLILauncher {
         String token = arguments.get("token");
         switch (arguments.get("plugin")) {
             default: displayHelpAndExit(false);
-            case "LignesUtilisateurs":
+            case "LignesUtilisateurs": 
                 if (arguments.size() > 5) {
                     displayHelpAndExit(true);
                 }
@@ -79,25 +79,33 @@ public class CLILauncher {
                 c.ouvrirPage();
                 break;
             case "InformationsTickets":
-                if (arguments.size() > 3) {
+                if (arguments.size() > 4) {
                     displayHelpAndExit(true);
                 }
                 InformationIssuesPlugin IIP = new InformationIssuesPlugin(id, token, adr);
-                IIP.affiche();
-                // c.creer(NLM.toString());
-                // c.ouvrirPage();
-                 break;
+                IIP.requestIssue();
+                c.creer(IIP.toHTML());
+                c.ouvrirPage();
+                break;
             case "CommitsUtilisateurs":
-                if (arguments.size() > 3) {
+                if (arguments.size() > 5) {
                     displayHelpAndExit(true);
                 }
+                boolean graphique = true;
+                if (arguments.get("graphique") != null && arguments.get("graphique").equals("false")) {
+                    graphique = false;
+                }
                 CommitsParUtilisateur CPU = new CommitsParUtilisateur(id,token,adr);
-                CPU.afficherGraphique();
-                // c.creer(CPU.toString());
-                // c.ouvrirPage();
-                 break;
+                if(graphique) {
+                    CPU.afficherGraphique();
+                }
+                else {
+                    c.creer(CPU.toHTML());
+                    c.ouvrirPage();
+                }
+                break;
             case "HistoriqueCommit" :
-                if (arguments.size() > 3) {
+                if (arguments.size() > 4) {
                     displayHelpAndExit(true);
                 }
                 CommitHistory CH = new CommitHistory(id, token, adr);
@@ -109,8 +117,8 @@ public class CLILauncher {
         return;
     }
 
-    private static void displayHelpAndExit(boolean arg) {
-        System.out.println(ANSI_RED);
+    private static void displayHelpAndExit(boolean arg) { //  Fonction appelée en cas de mauvais appel du programme, elle redirige vers le wiki.
+        System.out.print(ANSI_RED);
         if (arg) {
             System.out.println("Nombre d'arguments incorrects, veuillez consulter le wiki pour voir la liste des commandes disponibles et leurs utilisations");
         }

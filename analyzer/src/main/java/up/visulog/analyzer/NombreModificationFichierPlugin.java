@@ -1,13 +1,9 @@
 package up.visulog.analyzer;
 
 import java.util.*;
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-
-
-// TODO A retirer quand on aura modifPagz
 import java.io.*;
 
 public class NombreModificationFichierPlugin extends getAPI {
@@ -15,7 +11,6 @@ public class NombreModificationFichierPlugin extends getAPI {
     private String Branche;
     private LinkedList<String> CommitsParcourus = new LinkedList<String>();
 
-    // L'adresse c'est sans api/v4 et sans l'id projet
     public NombreModificationFichierPlugin(String project, String token, String adresse, String Chemin,
             String Branche,boolean tests) throws IOException {
         // Pour pouvoir utiliser le plugin il faut instancier le la classe avec : L'ID
@@ -43,7 +38,7 @@ public class NombreModificationFichierPlugin extends getAPI {
     
    
     
-    public Map<String, Object> NombreModif(String idCommitDepart, LinkedList<String> parcourus) throws IOException {
+    public Map<String, Object> NombreModif(String idCommitDepart, LinkedList<String> parcourus) throws IOException { // Renvoie : Le nombre de fois que le fichier a été modifié
         if (parcourus != null) {
             this.CommitsParcourus = parcourus;
         }
@@ -63,7 +58,7 @@ public class NombreModificationFichierPlugin extends getAPI {
                 if (idParent.equals("")) {
                     break;
                 }
-                if (idParent.contains(",")) {// Commits a deux parents
+                if (idParent.contains(",")) { // Commits a deux parents
                     String[] tabparent = idParent.split(",");
                     NombreModificationFichierPlugin temp = new NombreModificationFichierPlugin(this.Project, this.Token, this.Adresse, Chemin,"",false);
                     Map<String, Object> temporary = temp.NombreModif(tabparent[1], this.CommitsParcourus);
@@ -109,7 +104,7 @@ public class NombreModificationFichierPlugin extends getAPI {
         return result;
     }
 
-    private String idCommitParent(String idCommit) throws IOException { // Complété
+    private String idCommitParent(String idCommit) throws IOException { // Renvoie l'ID du commit parent d'un commit donné
         try {
             String request = "projects/" + this.Project + "/repository/commits/" + idCommit;
             super.request(request, null);
@@ -120,7 +115,7 @@ public class NombreModificationFichierPlugin extends getAPI {
         return "";
     }
 
-    private String idLastCommit() { // Complété
+    private String idLastCommit() { // Renvoie l'ID du commit le plus récent de la branche
         try {
             String request = "projects/" + super.Project + "/repository/branches/" + Branche;
             super.request(request, null);
@@ -131,7 +126,7 @@ public class NombreModificationFichierPlugin extends getAPI {
         return "";
     }
 
-    public String lectureJson(String s) {
+    public String lectureJson(String s) { // Traite un fichier JSON pour y récupérer les information voulues
         JSONParser jsonP = new JSONParser();
         try {
             if (s.equals("diff")) {
@@ -169,7 +164,7 @@ public class NombreModificationFichierPlugin extends getAPI {
         return "";
     }
 
-    public boolean fichierModif(String idCommit) {
+    public boolean fichierModif(String idCommit) { // Renvoie si le fichier à été modifié entre 2 commits
         try {
             String request = "projects/" + super.Project + "/repository/commits/" + idCommit + "/diff";
             super.request(request, null);
@@ -207,7 +202,7 @@ public class NombreModificationFichierPlugin extends getAPI {
         }
     }
 
-    private boolean testBranche(String Branche) {
+    private boolean testBranche(String Branche) {// Vérifie que la branche existe bel et bien sur le projet
         try {
             String request = "projects/" + super.Project + "/repository/branches/" + Branche ;
             super.request(request,null);
@@ -218,7 +213,7 @@ public class NombreModificationFichierPlugin extends getAPI {
         return true;
     }
     
-    public boolean testChemin(String chemin) {
+    public boolean testChemin(String chemin) { // Vérifie que le fichier existe bel et bien dans le répertoire
         try {
             String request = "projects/" + super.Project + "/repository/files/" + chemin;
             super.request(request,"ref="+this.Branche);
@@ -229,7 +224,7 @@ public class NombreModificationFichierPlugin extends getAPI {
         return true;
     }
 
-    public static String corrigeHTML(String S) {
+    public static String corrigeHTML(String S) { // Met les liens passés en paramètre au bon format
         String res = "";
         for (int i = 0; i < S.length(); i++) {
             if (S.charAt(i) == '/') {
@@ -239,40 +234,6 @@ public class NombreModificationFichierPlugin extends getAPI {
             }
         }
         return res;
-    }
-
-    public static String CreateHtmlPageheader(int NombredeCommits) {
-        String html = "<!DOCTYPE html>\n" +
-                "<html>\n" +
-                "   <head>\n" +
-                "      <style>\n" +
-                "td {\n" +
-                "  text-align: center;\n" +
-                "}\n" +
-                "table {\nwidth:50% ;\n" +
-                "}\n" +
-                "  th, td {\n" +
-                "            border: 1px solid black;\n" +
-                "            height: 25px;\n" +
-                "         }\n" +
-                "      </style>\n" +
-                "   </head>\n" +
-                "\n" +
-                "   <body>\n" +
-                "   \n" +
-                "      <h1>Number of Commits " + NombredeCommits + "</h1>\n" +
-                "      <h2>" + "</h2>\n" +
-                "\n" +
-                "      <table style=\"width:100%;text-align:center;border-collapse:collapse;background-color:gold;\">\n" +
-                "         <tr style=\"background-color:#00FF00\">\n" +
-                "            <th colspan=\"2\">Table of Commits</th>\n" +
-                "         </tr>\n" +
-                "         <tr style=\"background-color:#00FF00\" >\n" +
-                "            <td>Commit's ID </td>\n" +
-                "            <td rowspan=\"1\">Commit's Parent ID</td>\n" +
-                "         </tr>\n";
-
-        return html;
     }
 
     public static String CreateHtmlPage(Map<String, Object> CommitsMap) {    // convert hashmap to an HTML page
@@ -350,18 +311,6 @@ public class NombreModificationFichierPlugin extends getAPI {
                 "<script src=\"main.js\"></script>\n"+
                 "</body>\n"+
                 "</html>\n";
-
-        //  String tableEnding= "</table>\n";
-        File f = new File("./commits.html");
-        // try {
-        //     BufferedWriter bw = new BufferedWriter(new FileWriter(f));
-        //     bw.write(html);
-        //     bw.flush();
-        //     bw.close();
-
-        // } catch (IOException e) {
-        //     e.printStackTrace();
-        // }
         return html;
     }
 
