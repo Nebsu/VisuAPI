@@ -99,10 +99,6 @@ public class InformationIssuesPlugin extends getAPI {
         }
     }
 
-    public HashMap<String, LinkedList<String>> getData() {
-        return data;
-    }
-
     public String toHTML(){
         String s = "<html><link rel=\"stylesheet\" href=\"test.css\"><body><h1>Nombre de Commits par Utilisateur</h1>";
         int n = data.get("iid").size()-1;
@@ -122,7 +118,6 @@ public class InformationIssuesPlugin extends getAPI {
         p.requestIssue();
         HashMap<String, LinkedList<String>> data = p.getData();
         int n = data.get("iid").size()-1;
-        System.out.println(n);
         for(int i = 0; i < n; i++){
             for(String key: data.keySet()){
                 if(data.get(key)!= null){
@@ -136,6 +131,10 @@ public class InformationIssuesPlugin extends getAPI {
         CreatePage c = new CreatePage();
         c.creer(p.toHTML());
         c.ouvrirPage();
+    }
+
+    public HashMap<String, LinkedList<String>> getData() {
+        return data;
     }
 }
 
