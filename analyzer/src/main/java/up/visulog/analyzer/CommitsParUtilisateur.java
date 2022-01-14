@@ -211,7 +211,7 @@ public class CommitsParUtilisateur extends getAPI {
     }
 
     public String cssGenerator(){
-        StringBuilder css = new StringBuilder("body {background-color: white;display: flex;justify-content: center;align-items: center;flex-direction: column;}#my-pie-chart-container {display: flex;align-items: center;}  #my-pie-chart {background: conic-gradient(");
+        StringBuilder css = new StringBuilder("body {background-color: white; font-family: system-ui; display: flex;justify-content: center;align-items: center;flex-direction: column;} h1{text-align: center;}#my-pie-chart-container {display: flex;align-items: center;}  #my-pie-chart {background: conic-gradient(");
         double[]tab = getCommitsPercentile();
         String[]colorMem = new String[tab.length];
         int mem = 0;

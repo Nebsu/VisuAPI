@@ -242,3 +242,20 @@ table tr td{
     border-color:black;
 }
 
+    /* ////////////////////////////////////////// HISTORIQUE DE COMMIT /////////////////////////////////////////*/
+    
+
+table tr td{
+    text-align: center;
+    padding-top: 0.25cm;
+    padding-bottom: 0.25cm;
+}
+
+
+div.head {
+    background-color: #FFD9B2;
+}
+
+tr:nth-child(even) {background: #DFDFDF}
+tr:nth-child(odd) {background: #f1f1f1}
+

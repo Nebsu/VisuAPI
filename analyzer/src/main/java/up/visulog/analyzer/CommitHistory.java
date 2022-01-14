@@ -105,19 +105,19 @@ public class CommitHistory extends getAPI {
 
     public String toHTML(){
         StringBuilder html = new StringBuilder();
-        html.append("<html><link rel='stylesheet' type='text/css' href='test.css'><body>")
-        .append("<div class='title'><h1>VisuAPI</h1> <br> via Gitlab <div class='img'><img src='https://about.gitlab.com/images/press/logo/png/gitlab-icon-rgb.png' width='50' height='50'></div></div>");
+        html.append("<html><meta charset='utf-8'/><link rel='stylesheet' type='text/css' href='test.css'><body>")
+        .append("<div class='title'><h1>Statistiques du projet : X</h1> <br> via Gitlab <div class='img'><img src='https://about.gitlab.com/images/press/logo/png/gitlab-icon-rgb.png' width='50' height='50'></div></div>");
         
         html.append("<div class='histoCommits'> <h2>Historique de commits</h2> <table>")
-                .append("<tr> <td>Date</td> <td>Membre</td> <td>Message</td> <tr>");
+        .append("<tr id='head'> <td><strong>DATE</strong></td> <td><strong>MEMBRE</strong></td> <td><strong>MESSAGE</strong></td> </tr>").append("<br>");
 
-                for (Commit commit : commitsList) {
-                    html.append("<tr> <td>").append(commit.date).append("</td>") // Auteur du commit
-                    .append("<td>").append(commit.author).append("</td>") // Contenu du commit
-                    .append("<td>").append(commit.title).append("</td>") 
-                    .append("</tr>");
-                }
-                html.append("</table></div>");
+        for (Commit commit : commitsList) {
+            html.append("<tr> <td>").append(commit.date).append("</td>") // Auteur du commit
+            .append("<td>").append(commit.author).append("</td>") // Contenu du commit
+            .append("<td>").append(commit.title).append("</td>") 
+            .append("</tr>");
+        }
+        html.append("</table></div>");
 
         html.append("</body></html>");
         return html.toString();
