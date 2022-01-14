@@ -103,6 +103,20 @@ public class InformationIssuesPlugin extends getAPI {
         return data;
     }
 
+    public String toHTML(){
+        String s = "<html><link rel=\"stylesheet\" href=\"test.css\"><body><h1>Nombre de Commits par Utilisateur</h1>";
+        int n = data.get("iid").size()-1;
+        for(int i = 0; i < n; i++){
+            for(String key: data.keySet()){
+                if(data.get(key)!= null && !key.equals("assignees")){
+                    s += "<div>" + key + ": " +data.get(key).get(i) +"</div>";
+                }
+            }
+            s+= "<br>";
+        }
+        return s + "</body></html>";
+    }
+
     public static void main(String[] args) throws IOException, ParseException {
         InformationIssuesPlugin p = new InformationIssuesPlugin("3389", "8ax_oKvn8CMzvyPmxUD1", "https://gaufre.informatique.univ-paris-diderot.fr");
         p.requestIssue();
@@ -119,6 +133,9 @@ public class InformationIssuesPlugin extends getAPI {
             }
             System.out.println();
         }
+        CreatePage c = new CreatePage();
+        c.creer(p.toHTML());
+        c.ouvrirPage();
     }
 }
 

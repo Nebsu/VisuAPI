@@ -152,7 +152,7 @@ public class CommitsParUtilisateur extends getAPI {
 
     //Creation du code html
     public String toHTML(){
-        String s = "<html><body><h1>Nombre de Commits par Utilisateur</h1>";
+        String s = "<html><link rel=\"stylesheet\" href=\"test.css\"><body><h1>Nombre de Commits par Utilisateur</h1>";
         for(var item : result.entrySet()){
             s += "<li>"+item.getKey()+": "+item.getValue()+"</li>";
         }
@@ -246,12 +246,13 @@ public class CommitsParUtilisateur extends getAPI {
     public static void main(String[] args) throws IOException {
         CommitsParUtilisateur p = new CommitsParUtilisateur("3389", "bVqyB1SzLYKnSi6u1cdM", 
         "https://gaufre.informatique.univ-paris-diderot.fr");
-        p.afficherGraphique();
-        CommitsParUtilisateur p2 = new CommitsParUtilisateur("3389", null, 
-        "https://gaufre.informatique.univ-paris-diderot.fr");
-        p2.afficherGraphique();
+        //p.afficherGraphique();
+        p.creer(p.toHTML());
+        p.ouvrirPage();
+        //CommitsParUtilisateur p2 = new CommitsParUtilisateur("3389", null, 
+        //"https://gaufre.informatique.univ-paris-diderot.fr");
+        //p2.afficherGraphique();
         // CommitsParUtilisateur p3 = new CommitsParUtilisateur("2335175", null, null);
-        // p3.recupererCommits();
     }
 
 }
