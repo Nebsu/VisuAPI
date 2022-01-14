@@ -7,6 +7,7 @@ import org.json.simple.parser.ParseException;
 
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -37,8 +38,11 @@ public class InformationIssuesPlugin extends getAPI {
                     String name = (String) author.get("name");
                     data.get("author").add(name);
                 } else {
-                    if (temp.get(valeurArecuperer)!=null)
-                    data.get(valeurArecuperer).add(temp.get(valeurArecuperer).toString());
+                    if (temp.get(valeurArecuperer)!=null) {
+                        data.get(valeurArecuperer).add(temp.get(valeurArecuperer).toString());
+                    } else {
+                        data.get(valeurArecuperer).add(null);
+                    }
                 }
             }
         } catch (Exception e) {
@@ -103,7 +107,18 @@ public class InformationIssuesPlugin extends getAPI {
         InformationIssuesPlugin p = new InformationIssuesPlugin("3389", "8ax_oKvn8CMzvyPmxUD1", "https://gaufre.informatique.univ-paris-diderot.fr");
         p.requestIssue();
         HashMap<String, LinkedList<String>> data = p.getData();
-
+        int n = data.get("iid").size()-1;
+        System.out.println(n);
+        for(int i = 0; i < n; i++){
+            for(String key: data.keySet()){
+                if(data.get(key)!= null){
+                    System.out.println();
+                    System.out.print(key + ": ");
+                    System.out.print(data.get(key).get(i) + " ");
+                }
+            }
+            System.out.println();
+        }
     }
 }
 
