@@ -5,7 +5,7 @@ import java.util.*;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+
 
 // TODO A retirer quand on aura modifPagz
 import java.io.*;
@@ -13,49 +13,99 @@ import java.io.*;
 public class NombreModificationFichierPlugin extends getAPI {
     private String Chemin;
     private String Branche;
+    private LinkedList<String> CommitsParcourus = new LinkedList<String>();
 
     // L'adresse c'est sans api/v4 et sans l'id projet
-    public NombreModificationFichierPlugin(String project, String token, String adresse, String Chemin, String Branche) {
-        // Pour pouvoir utiliser le plugin il faut instancier le la classe avec : L'ID du projet,Un token existant,L'adresse du site (/!\ attention du site pas du projet),
-        // le chemin du fichier depuis votre dossier de dépot et pour finir la branche GIT d'où vous voulez partir (le tout dans cet ordre)
+    public NombreModificationFichierPlugin(String project, String token, String adresse, String Chemin,
+            String Branche,boolean tests) {
+        // Pour pouvoir utiliser le plugin il faut instancier le la classe avec : L'ID
+        // du projet,Un token existant,L'adresse du site (/!\ attention du site pas du
+        // projet),
+        // le chemin du fichier depuis votre dossier de dépot et pour finir la branche
+        // GIT d'où vous voulez partir (le tout dans cet ordre)
+        // J'ai aussi ajouté un boolean que vous devez initialiser à true
         // Il y a un exemple dans le main
         super(project, token, adresse);
-        this.Chemin = Chemin;
+        while (tests &&( Branche == null || Branche.equals("") || !testBranche(corrigeHTML(Branche))))  {
+            System.out.println("Veuillez réinsérer une Branche");
+            Scanner scanner = new Scanner(System.in);
+            Branche = scanner.next();
+        }
         this.Branche = corrigeHTML(Branche);
+        while (tests && (Chemin == null || !testChemin(corrigeHTML(Chemin))))  {
+            System.out.println("Veuillez réinsérer un Chemin");
+            Scanner scanner = new Scanner(System.in);
+            Chemin = scanner.next();
+        }
+        this.Chemin = corrigeHTML(Chemin);
     }
 
-    public Map<String, Object> NombreModif() throws IOException {
+    
+   
+    
+    public Map<String, Object> NombreModif(String idCommitDepart, LinkedList<String> parcourus) throws IOException {
+        if (parcourus != null) {
+            this.CommitsParcourus = parcourus;
+        }
         Map<String, Object> result = new HashMap<String, Object>();
         int acc = 0;
         ArrayList<String[]> L = new ArrayList<String[]>();
-        String idCommit = idLastCommit();
+        String idCommit;
+        if (idCommitDepart == null) {
+            idCommit = idLastCommit();
+        } else {
+            idCommit = idCommitDepart;
+        }
         String idParent = "";
         while (true) {
             idParent = idCommitParent(idCommit);
-            if (idParent.equals("")) {
-                break;
-            }
-            if (idParent.contains(",")) {// Commits a deux parents
-                // // TODO : Add dans la liste L le fait que y'ait fusion
-                String[] tabparent = idParent.split(",");
-                idParent = tabparent[0];
+            if (!CommitsParcourus.contains(idCommit)) {
+                if (idParent.equals("")) {
+                    break;
+                }
+                if (idParent.contains(",")) {// Commits a deux parents
+                    String[] tabparent = idParent.split(",");
+                    NombreModificationFichierPlugin temp = new NombreModificationFichierPlugin(this.Project, this.Token, this.Adresse, Chemin,"",false);
+                    Map<String, Object> temporary = temp.NombreModif(tabparent[1], this.CommitsParcourus);
+                    int nbrNouveau = (int) temporary.get("Nombre");
+                    if (nbrNouveau != 0) {
+                        acc += nbrNouveau;
+                        temporary.remove("Nombre");
+                        result.putAll(temporary);
+                    }
+                    CommitsParcourus = temp.CommitsParcourus;
+                    idParent = tabparent[0];
 
-            }
-            if (fichierModif(idCommit)) {
-                acc++;
-                System.out.println("Fichier modifié " + acc + " fois");
-                String[] commits = new String[2];
-                commits[0] = idCommit;
-                commits[1] = idParent;
-                System.out.println(" ID commit :" + commits[0]);
-                System.out.println(" ID parent :" + commits[1]);
-                L.add(commits);
+                }
+                if (fichierModif(idCommit)) {
+                    acc++;
+                    String[] commits = new String[2];
+                    commits[0] = idCommit;
+                    commits[1] = idParent;
+                    L.add(commits);
+                }
+                CommitsParcourus.add(idCommit);
+            } 
+            else {
+                break;
             }
             idCommit = idParent;
         }
+        if (!L.isEmpty()) {
+            String t = "Commits";
+            int accumulator = 0;
+            while (true) {
+                if (accumulator != 0) {
+                    t = t.substring(0, 7) + accumulator;
+                }
+                if (!result.containsKey(t)) {
+                    break;
+                }
+                accumulator++;
+            }
+            result.put(t, L);
+        }
         result.put("Nombre", acc);
-        result.put("Commits", L);
-        affiche(result);
         return result;
     }
 
@@ -90,8 +140,8 @@ public class NombreModificationFichierPlugin extends getAPI {
                     JSONObject temp = (JSONObject) diff;
                     String newP = temp.get("new_path").toString();
                     String oldP = temp.get("old_path").toString();
-                    if (oldP.equals(this.Chemin) || newP.equals(this.Chemin)) {
-                        return "true";
+                    if (newP.equals(this.Chemin)) {
+                        return oldP;
                     }
                 }
                 return "false";
@@ -113,14 +163,9 @@ public class NombreModificationFichierPlugin extends getAPI {
                     return id.toString();
                 }
             }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ParseException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
-
         return "";
     }
 
@@ -128,7 +173,12 @@ public class NombreModificationFichierPlugin extends getAPI {
         try {
             String request = "projects/" + super.Project + "/repository/commits/" + idCommit + "/diff";
             super.request(request, null);
-            return lectureJson("diff").equals("true");
+            String diff = lectureJson("diff"); 
+            if (!diff.equals("false")){
+                this.Chemin = diff;
+                return true;
+            }
+            return false;
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -156,6 +206,26 @@ public class NombreModificationFichierPlugin extends getAPI {
             }
         }
 
+    private boolean testBranche(String Branche) {
+        try {
+            String request = "projects/" + super.Project + "/repository/branches/" + Branche ;
+            super.request(request,null);
+        } catch (Exception e) {
+            System.out.println("Branche non existante");
+            return false;
+        }
+        return true;
+    }
+    
+    public boolean testChemin(String chemin) {
+        try {
+            String request = "projects/" + super.Project + "/repository/files/" + chemin;
+            super.request(request,"ref="+this.Branche);
+        } catch (Exception e) {
+            System.out.println("Fichier non existant");
+            return false;
+        }
+        return true;
     }
 
     public static String corrigeHTML(String S) {

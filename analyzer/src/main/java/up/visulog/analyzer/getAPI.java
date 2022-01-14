@@ -4,8 +4,12 @@ import java.io.*;
 import java.net.URL;
 import java.util.Scanner;
 
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
 public abstract class getAPI {
-    private String Token;
+    protected String Token;
     protected String Project;
     public String Adresse;
 
@@ -20,8 +24,15 @@ public abstract class getAPI {
             Adresse = "https://gitlab.com";
         }
         else {
-            Adresse = adresse;
+            if (!adresse.substring(0,8).equals("https://")){
+                Adresse = "https://"+adresse;
+            }
+            else {
+                Adresse = adresse;
+            }
+            System.out.println(Adresse);
             if(!testAdresse()) {
+                System.out.println(Adresse);
                 setAdresse(scan());
             }
         }
@@ -79,6 +90,7 @@ public abstract class getAPI {
             if(e.toString().substring(0,31).equals("java.net.MalformedURLException:")) {
                 System.out.println("Adresse invalide.");
                 System.out.println("Veuillez inserer un URL du type: https://gitlab.com ou appuyer sur entré pour utiliser https://gitlab.com");
+                System.out.println("(Enregistré actuellement : "+ this.Adresse + " ) ");
             }
             else {
                 System.out.println("URL invalide ou erreur de connexion.");
@@ -126,9 +138,9 @@ public abstract class getAPI {
         catch (Exception e) {
             System.out.println();
             System.out.println("ID de projet invalide. Veuillez :");
-            System.out.println("- Réinsérer un ID valide");
+            System.out.println("- Réinsérer un ID valide" + " (Enregistré actuellement : "+ this.Project + " ) ");
             System.out.println("ou");
-            System.out.println("- Entrer \"A\" pour changer l'adresse");
+            System.out.println("- Entrer \"A\" pour changer l'adresse"  + " (Enregistré actuellement : "+ this.Adresse + " ) ");
             System.out.println("ou");
             System.out.println("- Entrer \"T\" pour changer le token");
             return false;
@@ -138,6 +150,13 @@ public abstract class getAPI {
 
     public String scan() {
         return new Scanner(System.in).nextLine();
+    }
+
+    public String mailToImg(String mail) throws IOException, ParseException {
+        request("avatar","email=" + mail);
+        JSONParser jsonP = new JSONParser();
+        JSONObject image = (JSONObject) jsonP.parse(new FileReader("request.json"));
+        return (String) image.get("avatar_url");
     }
 
     protected void request(String uri, String args) throws IOException {
