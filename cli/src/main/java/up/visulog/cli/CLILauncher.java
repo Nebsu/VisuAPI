@@ -112,7 +112,7 @@ public class CLILauncher {
                 // TODO Faire en sorte de renvoyer une erreur si y'a trop d'args
 
                 boolean all = false;
-                if (arguments.get("all") != null && arguments.get("All").equals("true")) {
+                if (arguments.get("all") != null && arguments.get("all").equals("true")) {
                     all = true;
                 }
                 NombresLigneUtilisateur NLU = new NombresLigneUtilisateur(id, token, adr, all);
