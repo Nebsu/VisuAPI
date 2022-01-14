@@ -99,16 +99,10 @@ public class InformationIssuesPlugin extends getAPI {
         }
     }
 
-    public HashMap<String, LinkedList<String>> getData() {
-        return data;
-    }
-
-    public static void main(String[] args) throws IOException, ParseException {
-        InformationIssuesPlugin p = new InformationIssuesPlugin("3389", "8ax_oKvn8CMzvyPmxUD1", "https://gaufre.informatique.univ-paris-diderot.fr");
-        p.requestIssue();
-        HashMap<String, LinkedList<String>> data = p.getData();
+    public void affiche() throws IOException, ParseException {
+        requestIssue();
+        HashMap<String, LinkedList<String>> data = getData();
         int n = data.get("iid").size()-1;
-        System.out.println(n);
         for(int i = 0; i < n; i++){
             for(String key: data.keySet()){
                 if(data.get(key)!= null){
@@ -119,6 +113,19 @@ public class InformationIssuesPlugin extends getAPI {
             }
             System.out.println();
         }
+    }
+
+    public HashMap<String, LinkedList<String>> getData() {
+        return data;
+    }
+
+    public static void main(String[] args) throws IOException, ParseException {
+        InformationIssuesPlugin p = new InformationIssuesPlugin("3389", "8ax_oKvn8CMzvyPmxUD1", "https://gaufre.informatique.univ-paris-diderot.fr");
+        p.requestIssue();
+        HashMap<String, LinkedList<String>> data = p.getData();
+        int n = data.get("iid").size()-1;
+        System.out.println(n);
+        
     }
 }
 

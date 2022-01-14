@@ -17,7 +17,7 @@ public class NombreModificationFichierPlugin extends getAPI {
 
     // L'adresse c'est sans api/v4 et sans l'id projet
     public NombreModificationFichierPlugin(String project, String token, String adresse, String Chemin,
-            String Branche,boolean tests) {
+            String Branche,boolean tests) throws IOException {
         // Pour pouvoir utiliser le plugin il faut instancier le la classe avec : L'ID
         // du projet,Un token existant,L'adresse du site (/!\ attention du site pas du
         // projet),
@@ -205,6 +205,7 @@ public class NombreModificationFichierPlugin extends getAPI {
                 System.out.println(m.get(key).toString());
             }
         }
+    }
 
     private boolean testBranche(String Branche) {
         try {
@@ -238,59 +239,6 @@ public class NombreModificationFichierPlugin extends getAPI {
             }
         }
         return res;
-    }
-
-    public void CreateHtmlPage() throws IOException {
-        Map<String, Object> CommitsMap = NombreModif();
-        int NombredeCommits = (int) CommitsMap.get("Nombre");
-        String html = "<!DOCTYPE html>\n" +
-                "<html>\n" +
-                "   <head>\n" +
-                "      <style>\n" +
-                "td {\n" +
-                "  text-align: center;\n" +
-                "}\n" +
-                "table {\nwidth:50% ;\n" +
-                "}\n" +
-                "  th, td {\n" +
-                "            border: 1px solid black;\n" +
-                "            height: 25px;\n" +
-                "         }\n" +
-                "      </style>\n" +
-                "   </head>\n" +
-                "\n" +
-                "   <body>\n" +
-                "   \n" +
-                "      <h1>Number of Commits " + NombredeCommits + "</h1>\n" +
-                "      <h2>" + "</h2>\n" +
-                "\n" +
-                "      <table style=\"width:100%;text-align:center;border-collapse:collapse;background-color:gold;\">\n" +
-                "         <tr style=\"background-color:#00FF00\">\n" +
-                "            <th colspan=\"2\">Table of Commits</th>\n" +
-                "         </tr>\n" +
-                "         <tr style=\"background-color:#00FF00\" >\n" +
-                "            <td>Commit's ID </td>\n" +
-                "            <td rowspan=\"1\">Commit's Parent ID</td>\n" +
-                "         </tr>\n";
-
-        ArrayList<String[]> IdCouples = (ArrayList<String[]>) CommitsMap.get("Commits");
-
-        for (int i = 0; i < IdCouples.size(); i++) {
-            String[] temp = IdCouples.get(i);
-            html = html + "<tr style=\"background-color:yellowgreen;color:white;\"><td>" + temp[0] + "</td>";
-            html = html + "<td>" + temp[1] + "</td></tr>";
-        }
-        html = html + "    </table>\n" +
-                "   </body>\n" +
-                "</html>";
-        File f = new File("./commits.html");
-        try {
-            BufferedWriter bw = new BufferedWriter(new FileWriter(f));
-            bw.write(html);
-            bw.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     public static String CreateHtmlPageheader(int NombredeCommits) {
@@ -327,7 +275,7 @@ public class NombreModificationFichierPlugin extends getAPI {
         return html;
     }
 
-    public static void CreateHtmlPage(Map<String, Object> CommitsMap) {    // convert hashmap to an HTML page
+    public static String CreateHtmlPage(Map<String, Object> CommitsMap) {    // convert hashmap to an HTML page
         int NombredeCommits = (int) CommitsMap.get("Nombre");
         String html = " <!DOCTYPE html>\n" +
                 "<html lang=\"en\">\n" +
@@ -363,9 +311,14 @@ public class NombreModificationFichierPlugin extends getAPI {
         ArrayList<String[]> IdCouples = null;
         html=html+tablebegining;
         int index=0;
-
+        System.out.println(CommitsMap.size());
         for (int i=0; i<CommitsMap.size()-1; i++) {
-            IdCouples = (ArrayList<String[]>) CommitsMap.get("Commit"+i);
+            String c = "Commits";
+            if (i != 0) {  
+                c+=i;
+            }
+            IdCouples = (ArrayList<String[]>) CommitsMap.get(c);
+            System.out.println(IdCouples.size());
             for (int j=0; j<IdCouples.size(); j++ ) {
                 String[] temp = IdCouples.get(j);
                 index=index+1 ;
@@ -400,13 +353,16 @@ public class NombreModificationFichierPlugin extends getAPI {
 
         //  String tableEnding= "</table>\n";
         File f = new File("./commits.html");
-        try {
-            BufferedWriter bw = new BufferedWriter(new FileWriter(f));
-            bw.write(html);
-            bw.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        // try {
+        //     BufferedWriter bw = new BufferedWriter(new FileWriter(f));
+        //     bw.write(html);
+        //     bw.flush();
+        //     bw.close();
+
+        // } catch (IOException e) {
+        //     e.printStackTrace();
+        // }
+        return html;
     }
 
 
