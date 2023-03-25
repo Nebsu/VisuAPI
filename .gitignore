@@ -1,0 +1,9 @@
+.classpath
+build/
+.settings/
+.project
+bin/
+.gradle/
+.vscode/settings.json
+cli/example.html
+cli/request.json
